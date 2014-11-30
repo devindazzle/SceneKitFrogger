@@ -40,7 +40,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var gameState = GameState.WaitingForFirstTap
   var camera: SCNNode!
   var cameraOrthographicScale = 0.5
-  var cameraOffsetFromPlayer = SCNVector3(x: 0.25, y: 1.25, z: 0.55) //SCNVector3(x: 0.25, y: 1.25, z: 0.55)
+  var cameraOffsetFromPlayer = SCNVector3(x: 0.25, y: 1.25, z: 0.55)
   var level: SCNNode!
   var player: SCNNode!
   var playerModelNode: SCNNode!
@@ -50,6 +50,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var deltaTime: NSTimeInterval = 0
   var levelData: GameLevel!
   var sharedCarMaterial: SCNMaterial!
+  let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
   
   init(view: SCNView) {
@@ -246,6 +247,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
       switch type {
       case GameLevelDataType.Road:
+        
         // Create a road row
         let roadGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
         roadGeometry.widthSegmentCount = 1
@@ -260,6 +262,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
         break
         
       default:
+        
         // Create a grass row
         let grassGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
         grassGeometry.widthSegmentCount = 1
@@ -555,11 +558,11 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       
       if type == GameLevelDataType.Invalid || type == GameLevelDataType.Obstacle {
         // Invalid - do not move
-        println("Invalid move")
+        // println("Invalid move")
         
       } else {
         // Valid - move
-        println("Valid move to \(newPlayerGridCol), \(newPlayerGridRow)")
+        // println("Valid move to \(newPlayerGridCol), \(newPlayerGridRow)")
         
         playerGridCol = newPlayerGridCol
         playerGridRow = newPlayerGridRow
@@ -579,6 +582,11 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
         // Play the action
         player.runAction(moveAction)
         playerModelNode.runAction(jumpAction)
+        
+        // Play jump sound
+        if let overlay = view.overlaySKScene {
+          overlay.runAction(soundJump)
+        }
       }
       
       break
