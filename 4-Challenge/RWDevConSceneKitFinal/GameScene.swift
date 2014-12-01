@@ -52,6 +52,15 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var sharedCarMaterial: SCNMaterial!
   let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
+  /* FOR LAB SESSION */
+  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
+  var sharedMaterial: SCNMaterial!
+  /* FOR LAB SESSION */
+  
+  /* FOR CHALLENGE SESSION */
+  let carScene = SCNScene(named: "assets.scnassets/Models/car.dae")
+  /* FOR CHALLENGE SESSION */
+  
   
   init(view: SCNView) {
     self.view = view
@@ -81,6 +90,10 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     // Create omni light
     let omniLight = createOmniLightAtPosition(position: SCNVector3(x: -10.0, y: 20, z: 10.0))
     self.rootNode.addChildNode(omniLight)
+    
+    /* FOR LAB SESSION */
+    sharedMaterial = createSharedMaterial()
+    /* FOR LAB SESSION */
     
     // Create player
     let playerGridPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
@@ -154,7 +167,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
         
         // Create an action to make the node spawn cars
         let spawnAction = SCNAction.runBlock({ node in
-          let car = self.createCarAtPosition(position: node.position)
+          let car = self.createCarAtPosition(position: node.position, flipped: moveDirection > 0.0)
           car.runAction(
             SCNAction.sequence([SCNAction.moveBy(SCNVector3(x: moveDirection * self.levelData.gameLevelWidth(), y: 0.0, z: 0.0), duration: 10.0), SCNAction.removeFromParentNode()]))
           self.rootNode.addChildNode(car)
@@ -310,7 +323,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
+  /* func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
     let rootNode = SCNNode()
     rootNode.name = "Player"
     rootNode.position = position
@@ -334,10 +347,51 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     
     rootNode.addChildNode(playerModelNode)
     return rootNode
+  } */
+  
+  
+  /* FOR LAB SESSION */
+  func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
+    let rootNode = SCNNode()
+    rootNode.name = "Player"
+    rootNode.position = position
+    
+    // Create player model node
+    let playerGeometry = playerScene!.rootNode.childNodeWithName("Frog", recursively: true)!.geometry
+    let playerMaterial = SCNMaterial()
+    playerMaterial.diffuse.contents = UIColor(red: 225.0/255.0, green: 225.0/255.0, blue: 225.0/255.0, alpha: 1.0)
+    playerMaterial.locksAmbientWithDiffuse = false
+    playerMaterial.specular.contents = UIColor.darkGrayColor()
+    playerMaterial.shininess = 0.5
+    playerGeometry!.firstMaterial = sharedMaterial
+    playerModelNode = SCNNode()
+    playerModelNode.geometry = playerGeometry
+    playerModelNode.name = "PlayerModel"
+    
+    // Create a physicsbody for collision detection
+    playerModelNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    playerModelNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
+    playerModelNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
+    
+    rootNode.addChildNode(playerModelNode)
+    return rootNode
   }
+  /* FOR LAB SESSION */
   
   
-  func createCarAtPosition(#position: SCNVector3) -> SCNNode {
+  /* FOR LAB SESSION */
+  func createSharedMaterial() -> SCNMaterial {
+    let material = SCNMaterial()
+    material.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    material.locksAmbientWithDiffuse = false
+    material.specular.contents = UIColor.darkGrayColor()
+    material.shininess = 0.5
+    return material
+  }
+  /* FOR LAB SESSION */
+  
+  
+  /* func createCarAtPosition(#position: SCNVector3) -> SCNNode {
     let carGeometry = SCNBox(width: 0.4, height: 0.3, length: 0.15, chamferRadius: 0.0)
     
     if sharedCarMaterial == nil {
@@ -357,7 +411,30 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
     
     return carNode
+  } */
+  
+  
+  /* FOR CHALLENGE SESSION */
+  func createCarAtPosition(#position: SCNVector3, flipped: Bool) -> SCNNode {
+    let carGeometry = carScene!.rootNode.childNodeWithName("Car", recursively: true)!.geometry
+    carGeometry!.firstMaterial = sharedMaterial
+    
+    let carNode = SCNNode(geometry: carGeometry!)
+    carNode.name = "Car"
+    carNode.position = position
+    
+    if flipped {
+      carNode.rotation = SCNVector4(x: 0.0, y: 1.0, z: 0.0, w: 3.1415)
+    }
+    
+    // Create a physicsbody for collision detection
+    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
+    carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
+    
+    return carNode
   }
+  /* FOR CHALLENGE SESSION */
   
   
   // MARK: Game Play
@@ -483,7 +560,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
     // Player got hit by a car - Game over man
     if gameState == GameState.Playing {
-      switchToGameOver()
+      //switchToGameOver()
     }
   }
   
