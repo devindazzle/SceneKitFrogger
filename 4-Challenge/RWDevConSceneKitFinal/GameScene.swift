@@ -560,7 +560,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
     // Player got hit by a car - Game over man
     if gameState == GameState.Playing {
-      //switchToGameOver()
+      switchToGameOver()
     }
   }
   

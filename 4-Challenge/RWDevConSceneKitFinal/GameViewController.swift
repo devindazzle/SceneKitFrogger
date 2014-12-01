@@ -23,7 +23,7 @@ class GameViewController: UIViewController {
     
     // Set up the SCNView
     scnView.backgroundColor = UIColor(red: 100.0/255.0, green: 149.0/255.0, blue: 237.0/255.0, alpha: 1.0)
-    scnView.showsStatistics = false
+    scnView.showsStatistics = true
     scnView.allowsCameraControl = false
     scnView.antialiasingMode = SCNAntialiasingMode.Multisampling2X
     scnView.playing = true
