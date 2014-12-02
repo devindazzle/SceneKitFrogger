@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3B6CBF8A1A23878F00212E88"
-               BuildableName = "RWDevConSceneKitFinal.app"
-               BlueprintName = "RWDevConSceneKitFinal"
-               ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+               BlueprintIdentifier = "3BE6195A1A2DCDBA00ED80D7"
+               BuildableName = "SCNFrogger.app"
+               BlueprintName = "SCNFrogger"
+               ReferencedContainer = "container:SCNFrogger.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -28,10 +28,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3B6CBFA11A23878F00212E88"
-               BuildableName = "RWDevConSceneKitFinalTests.xctest"
-               BlueprintName = "RWDevConSceneKitFinalTests"
-               ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+               BlueprintIdentifier = "3BE619711A2DCDBA00ED80D7"
+               BuildableName = "SCNFroggerTests.xctest"
+               BlueprintName = "SCNFroggerTests"
+               ReferencedContainer = "container:SCNFrogger.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,20 +46,20 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3B6CBFA11A23878F00212E88"
-               BuildableName = "RWDevConSceneKitFinalTests.xctest"
-               BlueprintName = "RWDevConSceneKitFinalTests"
-               ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+               BlueprintIdentifier = "3BE619711A2DCDBA00ED80D7"
+               BuildableName = "SCNFroggerTests.xctest"
+               BlueprintName = "SCNFroggerTests"
+               ReferencedContainer = "container:SCNFrogger.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3B6CBF8A1A23878F00212E88"
-            BuildableName = "RWDevConSceneKitFinal.app"
-            BlueprintName = "RWDevConSceneKitFinal"
-            ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+            BlueprintIdentifier = "3BE6195A1A2DCDBA00ED80D7"
+            BuildableName = "SCNFrogger.app"
+            BlueprintName = "SCNFrogger"
+            ReferencedContainer = "container:SCNFrogger.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -75,10 +75,10 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3B6CBF8A1A23878F00212E88"
-            BuildableName = "RWDevConSceneKitFinal.app"
-            BlueprintName = "RWDevConSceneKitFinal"
-            ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+            BlueprintIdentifier = "3BE6195A1A2DCDBA00ED80D7"
+            BuildableName = "SCNFrogger.app"
+            BlueprintName = "SCNFrogger"
+            ReferencedContainer = "container:SCNFrogger.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -93,10 +93,10 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3B6CBF8A1A23878F00212E88"
-            BuildableName = "RWDevConSceneKitFinal.app"
-            BlueprintName = "RWDevConSceneKitFinal"
-            ReferencedContainer = "container:RWDevConSceneKitFinal.xcodeproj">
+            BlueprintIdentifier = "3BE6195A1A2DCDBA00ED80D7"
+            BuildableName = "SCNFrogger.app"
+            BlueprintName = "SCNFrogger"
+            ReferencedContainer = "container:SCNFrogger.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

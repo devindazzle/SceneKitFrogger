@@ -15,7 +15,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
                 </imageView>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="rwdevcon-logo" translatesAutoresizingMaskIntoConstraints="NO" id="J1g-TT-kJ3">
-                    <rect key="frame" x="118" y="120" width="240" height="240"/>
+                    <rect key="frame" x="120" y="120" width="240" height="240"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="J1g-TT-kJ3" secondAttribute="height" multiplier="1:1" id="kC7-Yk-ZyS"/>
                     </constraints>
