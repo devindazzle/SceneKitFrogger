@@ -100,7 +100,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     player.addChildNode(camera)
     
     // Create nodes for level
-    level = createLevelAtPosition(position: SCNVector3Zero)
+    level = levelData.createLevelAtPosition(position: SCNVector3Zero)
     self.rootNode.addChildNode(level)
     
     // Start the game
@@ -172,106 +172,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     lightNode.light = light
     lightNode.position = position
     return lightNode
-  }
-  
-  
-  func createLevelAtPosition(#position: SCNVector3) -> SCNNode {
-    
-    let levelNode = SCNNode()
-    
-    // Create light grass material
-    let lightGrassMaterial = SCNMaterial()
-    lightGrassMaterial.diffuse.contents = UIColor(red: 190.0/255.0, green: 244.0/255.0, blue: 104.0/255.0, alpha: 1.0)
-    lightGrassMaterial.locksAmbientWithDiffuse = false
-    
-    // Create dark grass material
-    let darkGrassMaterial = SCNMaterial()
-    darkGrassMaterial.diffuse.contents = UIColor(red: 183.0/255.0, green: 236.0/255.0, blue: 96.0/255.0, alpha: 1.0)
-    darkGrassMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree top material
-    let treeTopMaterial = SCNMaterial()
-    treeTopMaterial.diffuse.contents = UIColor(red: 118.0/255.0, green: 141.0/255.0, blue: 25.0/255.0, alpha: 1.0)
-    treeTopMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree trunk material
-    let treeTrunkMaterial = SCNMaterial()
-    treeTrunkMaterial.diffuse.contents = UIColor(red: 185.0/255.0, green: 122.0/255.0, blue: 87.0/255.0, alpha: 1.0)
-    treeTrunkMaterial.locksAmbientWithDiffuse = false
-    
-    // Create road material
-    let roadMaterial = SCNMaterial()
-    roadMaterial.diffuse.contents = UIColor.darkGrayColor()
-    roadMaterial.diffuse.wrapT = SCNWrapMode.Repeat
-    roadMaterial.locksAmbientWithDiffuse = false
-    
-    // First, create geometry for grass and roads
-    for row in 0..<levelData.data.rowCount() {
-      
-      // HACK: Check column 5 as column 0 to 4 will always be obstacles
-      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
-      switch type {
-      case GameLevelDataType.Road:
-        
-        // Create a road row
-        let roadGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        roadGeometry.widthSegmentCount = 1
-        roadGeometry.heightSegmentCount = 1
-        roadGeometry.firstMaterial = roadMaterial
-        
-        let roadNode = SCNNode(geometry: roadGeometry)
-        roadNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        roadNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(roadNode)
-        
-        break
-        
-      default:
-        
-        // Create a grass row
-        let grassGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        grassGeometry.widthSegmentCount = 1
-        grassGeometry.heightSegmentCount = 1
-        grassGeometry.firstMaterial = row % 2 == 0 ? lightGrassMaterial : darkGrassMaterial
-        
-        let grassNode = SCNNode(geometry: grassGeometry)
-        grassNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        grassNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(grassNode)
-        
-        // Create obstacles
-        for col in 0..<levelData.data.columnCount() {
-          let subType = levelData.gameLevelDataTypeForGridPosition(column: col, row: row)
-          if subType == GameLevelDataType.Obstacle {
-            // Height of tree top is random
-            let treeHeight = CGFloat((arc4random_uniform(5) + 2)) / 10.0
-            let treeTopPosition = Float(treeHeight / 2.0 + 0.1)
-            
-            // Create a tree
-            let treeTopGeomtery = SCNBox(width: 0.1, height: treeHeight, length: 0.1, chamferRadius: 0.0)
-            treeTopGeomtery.firstMaterial = treeTopMaterial
-            let treeTopNode = SCNNode(geometry: treeTopGeomtery)
-            let gridPosition = levelData.coordinatesForGridPosition(column: col, row: row)
-            treeTopNode.position = SCNVector3(x: gridPosition.x, y: treeTopPosition, z: gridPosition.z)
-            levelNode.addChildNode(treeTopNode)
-            
-            let treeTrunkGeometry = SCNBox(width: 0.05, height: 0.1, length: 0.05, chamferRadius: 0.0)
-            treeTrunkGeometry.firstMaterial = treeTrunkMaterial
-            let treeTrunkNode = SCNNode(geometry: treeTrunkGeometry)
-            treeTrunkNode.position = SCNVector3(x: gridPosition.x, y: 0.05, z: gridPosition.z)
-            levelNode.addChildNode(treeTrunkNode)
-          }
-        }
-        
-        break
-      }
-    }
-    
-    // Combine all the geometry into one - this will reduce the number of draw calls and improve performance
-    let flatLevelNode = levelNode.flattenedClone()
-    flatLevelNode.name = "Level"
-    
-    return flatLevelNode
   }
   
   
