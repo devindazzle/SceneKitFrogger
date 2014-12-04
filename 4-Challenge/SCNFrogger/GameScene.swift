@@ -282,16 +282,19 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     rootNode.position = position
     
     // Create player model node
-    let playerGeometry = playerScene!.rootNode.childNodeWithName("Frog", recursively: true)!.geometry
-    let playerMaterial = SCNMaterial()
-    playerMaterial.diffuse.contents = UIColor(red: 225.0/255.0, green: 225.0/255.0, blue: 225.0/255.0, alpha: 1.0)
-    playerMaterial.locksAmbientWithDiffuse = false
-    playerMaterial.specular.contents = UIColor.darkGrayColor()
-    playerMaterial.shininess = 0.5
-    playerGeometry!.firstMaterial = sharedMaterial
-    playerModelNode = SCNNode()
-    playerModelNode.geometry = playerGeometry
+    playerModelNode = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)!
     playerModelNode.name = "PlayerModel"
+    
+    // let playerGeometry = playerScene!.rootNode.childNodeWithName("Frog", recursively: true)!.geometry
+    // Create a material for the frog
+    let playerMaterial = SCNMaterial()
+    playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    playerMaterial.locksAmbientWithDiffuse = false
+    playerMaterial.specular.contents = UIColor.whiteColor()
+    playerMaterial.shininess = 1.0
+    
+    // Assign the material to the playerModelNode
+    playerModelNode.geometry!.firstMaterial = playerMaterial
     
     // Create a physicsbody for collision detection
     playerModelNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)

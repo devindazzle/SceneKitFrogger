@@ -14,7 +14,7 @@
 		<string>https://github.com/devindazzle/SceneKitFrogger.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>1-Starter/SCNFrogger.xcodeproj</string>
+	<string>2-Demo/SCNFrogger.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>C45253657BF1B0A67E13F808D5E653AC34B147B3</key>
