@@ -163,10 +163,18 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
         
         // Create an action to make the node spawn cars
         let spawnAction = SCNAction.runBlock({ node in
-          let car = self.createCarAtPosition(position: node.position, flipped: moveDirection > 0.0)
+          let car = self.createCarAtPosition(position: node.position)
+          
+          // TODO: Add the code to make the car move
+          // Make sure the car is facing in the driving direction
+          if moveDirection > 0.0 {
+            car.rotation = SCNVector4(x: 0.0, y: 1.0, z: 0.0, w: 3.1415)
+          }
+          
           car.runAction(
             SCNAction.sequence([SCNAction.moveBy(SCNVector3(x: moveDirection * self.levelData.gameLevelWidth(), y: 0.0, z: 0.0), duration: 10.0), SCNAction.removeFromParentNode()]))
           self.rootNode.addChildNode(car)
+          
         })
         // Will spawn a new car every 5 + (random time interval up to 5 seconds)
         let delayAction = SCNAction.waitForDuration(5.0, withRange: 5.0)
@@ -357,17 +365,13 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createCarAtPosition(#position: SCNVector3, flipped: Bool) -> SCNNode {
+  func createCarAtPosition(#position: SCNVector3) -> SCNNode {
     let carGeometry = carScene!.rootNode.childNodeWithName("Car", recursively: true)!.geometry
     carGeometry!.firstMaterial = sharedMaterial
     
     let carNode = SCNNode(geometry: carGeometry!)
     carNode.name = "Car"
     carNode.position = position
-    
-    if flipped {
-      carNode.rotation = SCNVector4(x: 0.0, y: 1.0, z: 0.0, w: 3.1415)
-    }
     
     // Create a physicsbody for collision detection
     carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
