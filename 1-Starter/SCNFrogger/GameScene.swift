@@ -46,12 +46,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var levelData: GameLevel!
   
   // TODO: Add player properties here
-  var player: SCNNode!
-  var playerModelNode: SCNNode!
-  var playerGridCol = 7
-  var playerGridRow = 6
-  
-  let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
   
   init(view: SCNView) {
@@ -84,14 +78,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     self.rootNode.addChildNode(omniLight)
     
     // TODO: Add code to initialize player here
-    let playerGridPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
-    player = createPlayerAtPosition(position: SCNVector3(x: playerGridPosition.x, y: 0.1, z: playerGridPosition.z))
-    self.rootNode.addChildNode(player)
     
     // TODO: Add code to create camera here
-    camera = createCameraAtPosition(position: cameraOffsetFromPlayer)
-    camera.constraints = [SCNLookAtConstraint(target: player)]
-    player.addChildNode(camera)
     
     // Create nodes for level
     level = levelData.createLevelAtPosition(position: SCNVector3Zero)
@@ -214,30 +202,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   
   // TODO: Add code to create player here
-  func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
-    let rootNode = SCNNode()
-    rootNode.name = "Player"
-    rootNode.position = position
-    
-    // Create player model node
-    playerModelNode = SCNNode()
-    playerModelNode.name = "PlayerModel"
-    
-    let playerMaterial = SCNMaterial()
-    playerMaterial.diffuse.contents = UIColor.darkGrayColor()
-    playerMaterial.locksAmbientWithDiffuse = false
-    
-    // Assign the material to the playerModelNode
-    playerModelNode.geometry!.firstMaterial = playerMaterial
-    
-    // Create a physicsbody for collision detection
-    playerModelNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
-    playerModelNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
-    playerModelNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
-    
-    rootNode.addChildNode(playerModelNode)
-    return rootNode
-  }
   
   
   func createSharedMaterial() -> SCNMaterial {
@@ -256,7 +220,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func didPlayerReachEndOfLevel() -> Bool {
     // TODO: Uncomment code to test for player reaching the end of level
-    return playerGridRow == levelData.data.rowCount() - 7
+    return false // playerGridRow == levelData.data.rowCount() - 7
   }
   
   
@@ -374,7 +338,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   func handleTap(gesture: UIGestureRecognizer) {
     if let tapGesture = gesture as? UITapGestureRecognizer {
       // TODO: Add code to do movement here
-      movePlayerInDirection(MoveDirection.Forward)
     }
   }
   
@@ -385,22 +348,18 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       switch swipeGesture.direction {
       case UISwipeGestureRecognizerDirection.Up:
         // TODO: Add code to do movement here
-        movePlayerInDirection(MoveDirection.Forward)
         break
         
       case UISwipeGestureRecognizerDirection.Down:
         // TODO: Add code to do movement here
-        movePlayerInDirection(MoveDirection.Backward)
         break
         
       case UISwipeGestureRecognizerDirection.Left:
         // TODO: Add code to do movement here
-        movePlayerInDirection(MoveDirection.Left)
         break
         
       case UISwipeGestureRecognizerDirection.Right:
         // TODO: Add code to do movement here
-        movePlayerInDirection(MoveDirection.Right)
         break
         
       default:
@@ -410,7 +369,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   // TODO: Uncomment code for player movement here
-  func movePlayerInDirection(direction: MoveDirection) {
+  /* func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
     case GameState.WaitingForFirstTap:
@@ -494,6 +453,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       break
     }
     
-  }
+  } */
   
 }

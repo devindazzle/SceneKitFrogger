@@ -51,12 +51,14 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var playerGridCol = 7
   var playerGridRow = 6
   
+  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")!
+  
   let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
-  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
-  var sharedMaterial: SCNMaterial!
+  let carScene = SCNScene(named: "assets.scnassets/Models/car.dae")!
   
-  let carScene = SCNScene(named: "assets.scnassets/Models/car.dae")
+  // Added as answer to question in challenge
+  var sharedMaterial: SCNMaterial!
   
   
   init(view: SCNView) {
@@ -102,7 +104,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     player.addChildNode(camera)
     
     // Create nodes for level
-    level = createLevelAtPosition(position: SCNVector3Zero)
+    level = levelData.createLevelAtPosition(position: SCNVector3Zero)
     self.rootNode.addChildNode(level)
     
     // Create cars
@@ -163,6 +165,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
         
         // Create an action to make the node spawn cars
         let spawnAction = SCNAction.runBlock({ node in
+          
+          // TODO: Change code to create a car
           let car = self.createCarAtPosition(position: node.position)
           
           // TODO: Add the code to make the car move
@@ -227,106 +231,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createLevelAtPosition(#position: SCNVector3) -> SCNNode {
-    
-    let levelNode = SCNNode()
-    
-    // Create light grass material
-    let lightGrassMaterial = SCNMaterial()
-    lightGrassMaterial.diffuse.contents = UIColor(red: 190.0/255.0, green: 244.0/255.0, blue: 104.0/255.0, alpha: 1.0)
-    lightGrassMaterial.locksAmbientWithDiffuse = false
-    
-    // Create dark grass material
-    let darkGrassMaterial = SCNMaterial()
-    darkGrassMaterial.diffuse.contents = UIColor(red: 183.0/255.0, green: 236.0/255.0, blue: 96.0/255.0, alpha: 1.0)
-    darkGrassMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree top material
-    let treeTopMaterial = SCNMaterial()
-    treeTopMaterial.diffuse.contents = UIColor(red: 118.0/255.0, green: 141.0/255.0, blue: 25.0/255.0, alpha: 1.0)
-    treeTopMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree trunk material
-    let treeTrunkMaterial = SCNMaterial()
-    treeTrunkMaterial.diffuse.contents = UIColor(red: 185.0/255.0, green: 122.0/255.0, blue: 87.0/255.0, alpha: 1.0)
-    treeTrunkMaterial.locksAmbientWithDiffuse = false
-    
-    // Create road material
-    let roadMaterial = SCNMaterial()
-    roadMaterial.diffuse.contents = UIColor.darkGrayColor()
-    roadMaterial.diffuse.wrapT = SCNWrapMode.Repeat
-    roadMaterial.locksAmbientWithDiffuse = false
-    
-    // First, create geometry for grass and roads
-    for row in 0..<levelData.data.rowCount() {
-      
-      // HACK: Check column 5 as column 0 to 4 will always be obstacles
-      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
-      switch type {
-      case GameLevelDataType.Road:
-        
-        // Create a road row
-        let roadGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        roadGeometry.widthSegmentCount = 1
-        roadGeometry.heightSegmentCount = 1
-        roadGeometry.firstMaterial = roadMaterial
-        
-        let roadNode = SCNNode(geometry: roadGeometry)
-        roadNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        roadNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(roadNode)
-        
-        break
-        
-      default:
-        
-        // Create a grass row
-        let grassGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        grassGeometry.widthSegmentCount = 1
-        grassGeometry.heightSegmentCount = 1
-        grassGeometry.firstMaterial = row % 2 == 0 ? lightGrassMaterial : darkGrassMaterial
-        
-        let grassNode = SCNNode(geometry: grassGeometry)
-        grassNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        grassNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(grassNode)
-        
-        // Create obstacles
-        for col in 0..<levelData.data.columnCount() {
-          let subType = levelData.gameLevelDataTypeForGridPosition(column: col, row: row)
-          if subType == GameLevelDataType.Obstacle {
-            // Height of tree top is random
-            let treeHeight = CGFloat((arc4random_uniform(5) + 2)) / 10.0
-            let treeTopPosition = Float(treeHeight / 2.0 + 0.1)
-            
-            // Create a tree
-            let treeTopGeomtery = SCNBox(width: 0.1, height: treeHeight, length: 0.1, chamferRadius: 0.0)
-            treeTopGeomtery.firstMaterial = treeTopMaterial
-            let treeTopNode = SCNNode(geometry: treeTopGeomtery)
-            let gridPosition = levelData.coordinatesForGridPosition(column: col, row: row)
-            treeTopNode.position = SCNVector3(x: gridPosition.x, y: treeTopPosition, z: gridPosition.z)
-            levelNode.addChildNode(treeTopNode)
-            
-            let treeTrunkGeometry = SCNBox(width: 0.05, height: 0.1, length: 0.05, chamferRadius: 0.0)
-            treeTrunkGeometry.firstMaterial = treeTrunkMaterial
-            let treeTrunkNode = SCNNode(geometry: treeTrunkGeometry)
-            treeTrunkNode.position = SCNVector3(x: gridPosition.x, y: 0.05, z: gridPosition.z)
-            levelNode.addChildNode(treeTrunkNode)
-          }
-        }
-        
-        break
-      }
-    }
-    
-    // Combine all the geometry into one - this will reduce the number of draw calls and improve performance
-    let flatLevelNode = levelNode.flattenedClone()
-    flatLevelNode.name = "Level"
-    
-    return flatLevelNode
-  }
-  
-  
   // TODO: Add code to create player here
   func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
     let rootNode = SCNNode()
@@ -334,16 +238,16 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     rootNode.position = position
     
     // Create player model node
-    let playerGeometry = playerScene!.rootNode.childNodeWithName("Frog", recursively: true)!.geometry
-    let playerMaterial = SCNMaterial()
-    playerMaterial.diffuse.contents = UIColor(red: 225.0/255.0, green: 225.0/255.0, blue: 225.0/255.0, alpha: 1.0)
-    playerMaterial.locksAmbientWithDiffuse = false
-    playerMaterial.specular.contents = UIColor.darkGrayColor()
-    playerMaterial.shininess = 0.5
-    playerGeometry!.firstMaterial = sharedMaterial
-    playerModelNode = SCNNode()
-    playerModelNode.geometry = playerGeometry
+    playerModelNode = playerScene.rootNode.childNodeWithName("Frog", recursively: false)!
     playerModelNode.name = "PlayerModel"
+    
+    // Create a material for the frog
+    // let playerMaterial = SCNMaterial()
+    // playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    // playerMaterial.locksAmbientWithDiffuse = false
+    
+    // Assign the material to the playerModelNode
+    playerModelNode.geometry!.firstMaterial = sharedMaterial
     
     // Create a physicsbody for collision detection
     playerModelNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
@@ -355,6 +259,30 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
+  // TODO: Add code to create cars here
+  func createCarAtPosition(#position: SCNVector3) -> SCNNode {
+    // Create a clone of the car since we need multiple copies
+    let carNode = carScene.rootNode.childNodeWithName("Car", recursively: false)!.clone() as SCNNode
+    carNode.name = "Car"
+    carNode.position = position
+    
+    // Create a material for the car
+    let carMaterial = SCNMaterial()
+    carMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    carMaterial.locksAmbientWithDiffuse = false
+    
+    // Assign the material to the car
+    carNode.geometry!.firstMaterial = sharedMaterial
+    
+    // Create a physicsbody for collision detection
+    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
+    carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
+      
+    return carNode
+  }
+  
+  // Solution to question in challenge - given at conclusion
   func createSharedMaterial() -> SCNMaterial {
     let material = SCNMaterial()
     material.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
@@ -362,23 +290,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     material.specular.contents = UIColor.darkGrayColor()
     material.shininess = 0.5
     return material
-  }
-  
-  
-  func createCarAtPosition(#position: SCNVector3) -> SCNNode {
-    let carGeometry = carScene!.rootNode.childNodeWithName("Car", recursively: true)!.geometry
-    carGeometry!.firstMaterial = sharedMaterial
-    
-    let carNode = SCNNode(geometry: carGeometry!)
-    carNode.name = "Car"
-    carNode.position = position
-    
-    // Create a physicsbody for collision detection
-    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
-    carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
-    carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
-    
-    return carNode
   }
   
   
@@ -539,7 +450,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     }
   }
   
-  // TODO: Add code for player movement here
+  // TODO: Uncomment code for player movement here
   func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {

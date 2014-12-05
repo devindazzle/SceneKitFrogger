@@ -51,10 +51,11 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var playerGridCol = 7
   var playerGridRow = 6
   
+  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")!
+  
   let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
-  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
-  var sharedMaterial: SCNMaterial!
+  let carScene = SCNScene(named: "assets.scnassets/Models/car.dae")!
   
   
   init(view: SCNView) {
@@ -86,9 +87,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     let omniLight = createOmniLightAtPosition(position: SCNVector3(x: -10.0, y: 20, z: 10.0))
     self.rootNode.addChildNode(omniLight)
     
-    // Create shared material
-    sharedMaterial = createSharedMaterial()
-    
     // TODO: Add code to initialize player here
     let playerGridPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
     player = createPlayerAtPosition(position: SCNVector3(x: playerGridPosition.x, y: 0.1, z: playerGridPosition.z))
@@ -102,6 +100,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     // Create nodes for level
     level = levelData.createLevelAtPosition(position: SCNVector3Zero)
     self.rootNode.addChildNode(level)
+    
+    // Create cars
+    setupCarSpawnNodes()
     
     // Start the game
     switchToWaitingForFirstTap()
@@ -133,6 +134,55 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
     swipeRightGesture.direction = UISwipeGestureRecognizerDirection.Right
     view.addGestureRecognizer(swipeRightGesture)
+  }
+  
+  
+  func setupCarSpawnNodes() {
+    // For each road, place car spawn node.
+    for row in 0..<levelData.data.rowCount() {
+      
+      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
+      
+      if type == GameLevelDataType.Road {
+        
+        // Determine if the car should start from the left of the right
+        let startCol = row % 2 == 0 ? 0 : levelData.data.columnCount() - 1
+        let moveDirection : Float = row % 2 == 0 ? 1.0 : -1.0
+        
+        // Determine the position of the node
+        var position = levelData.coordinatesForGridPosition(column: startCol, row: row)
+        position = SCNVector3(x: position.x, y: 0.15, z: position.z)
+        
+        // Create node
+        let spawnNode = SCNNode()
+        spawnNode.position = position
+        
+        // Create an action to make the node spawn cars
+        let spawnAction = SCNAction.runBlock({ node in
+          
+          // TODO: Change code to create a car
+          let car = self.createCarAtPosition(position: node.position)
+          
+          // TODO: Add the code to make the car move
+          // Make sure the car is facing in the driving direction
+          if moveDirection > 0.0 {
+            car.rotation = SCNVector4(x: 0.0, y: 1.0, z: 0.0, w: 3.1415)
+          }
+          
+          car.runAction(
+            SCNAction.sequence([SCNAction.moveBy(SCNVector3(x: moveDirection * self.levelData.gameLevelWidth(), y: 0.0, z: 0.0), duration: 10.0), SCNAction.removeFromParentNode()]))
+          self.rootNode.addChildNode(car)
+          
+        })
+        // Will spawn a new car every 5 + (random time interval up to 5 seconds)
+        let delayAction = SCNAction.waitForDuration(5.0, withRange: 5.0)
+        
+        spawnNode.runAction(SCNAction.repeatActionForever(SCNAction.sequence([delayAction, spawnAction])))
+        
+        self.rootNode.addChildNode(spawnNode)
+      }
+      
+    }
   }
   
   
@@ -182,16 +232,13 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     rootNode.position = position
     
     // Create player model node
-    playerModelNode = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)!
+    playerModelNode = playerScene.rootNode.childNodeWithName("Frog", recursively: false)!
     playerModelNode.name = "PlayerModel"
     
-    // let playerGeometry = playerScene!.rootNode.childNodeWithName("Frog", recursively: true)!.geometry
     // Create a material for the frog
     let playerMaterial = SCNMaterial()
     playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
     playerMaterial.locksAmbientWithDiffuse = false
-    playerMaterial.specular.contents = UIColor.whiteColor()
-    playerMaterial.shininess = 1.0
     
     // Assign the material to the playerModelNode
     playerModelNode.geometry!.firstMaterial = playerMaterial
@@ -206,13 +253,27 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createSharedMaterial() -> SCNMaterial {
-    let material = SCNMaterial()
-    material.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
-    material.locksAmbientWithDiffuse = false
-    material.specular.contents = UIColor.darkGrayColor()
-    material.shininess = 0.5
-    return material
+  // TODO: Add code to create cars here
+  func createCarAtPosition(#position: SCNVector3) -> SCNNode {
+    // Create a clone of the car since we need multiple copies
+    let carNode = carScene.rootNode.childNodeWithName("Car", recursively: false)!.clone() as SCNNode
+    carNode.name = "Car"
+    carNode.position = position
+    
+    // Create a material for the car
+    let carMaterial = SCNMaterial()
+    carMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    carMaterial.locksAmbientWithDiffuse = false
+    
+    // Assign the material to the car
+    carNode.geometry!.firstMaterial = carMaterial
+    
+    // Create a physicsbody for collision detection
+    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
+    carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
+      
+    return carNode
   }
   
   
@@ -373,7 +434,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     }
   }
   
-  // TODO: Add code for player movement here
+  // TODO: Uncomment code for player movement here
   func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
