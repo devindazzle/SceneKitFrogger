@@ -46,6 +46,12 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   var levelData: GameLevel!
   
   // TODO: Add player properties here
+  var player: SCNNode!
+  var playerModelNode: SCNNode!
+  var playerGridCol = 7
+  var playerGridRow = 6
+  
+  let soundJump = SKAction.playSoundFileNamed("assets.scnassets/Sounds/jump.wav", waitForCompletion: false)
   
   
   init(view: SCNView) {
@@ -78,14 +84,21 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     self.rootNode.addChildNode(omniLight)
     
     // TODO: Add code to initialize player here
-    
+    let playerGridPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+    player = createPlayerAtPosition(position: SCNVector3(x: playerGridPosition.x, y: 0.1, z: playerGridPosition.z))
+    self.rootNode.addChildNode(player)
     
     // TODO: Add code to create camera here
-    
+    camera = createCameraAtPosition(position: cameraOffsetFromPlayer)
+    camera.constraints = [SCNLookAtConstraint(target: player)]
+    player.addChildNode(camera)
     
     // Create nodes for level
-    level = createLevelAtPosition(position: SCNVector3Zero)
+    level = levelData.createLevelAtPosition(position: SCNVector3Zero)
     self.rootNode.addChildNode(level)
+    
+    // Create cars
+    setupCarSpawnNodes()
     
     // Start the game
     switchToWaitingForFirstTap()
@@ -117,6 +130,47 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
     swipeRightGesture.direction = UISwipeGestureRecognizerDirection.Right
     view.addGestureRecognizer(swipeRightGesture)
+  }
+  
+  
+  func setupCarSpawnNodes() {
+    // For each road, place car spawn node.
+    for row in 0..<levelData.data.rowCount() {
+      
+      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
+      
+      if type == GameLevelDataType.Road {
+        
+        // Determine if the car should start from the left of the right
+        let startCol = row % 2 == 0 ? 0 : levelData.data.columnCount() - 1
+        let moveDirection : Float = row % 2 == 0 ? 1.0 : -1.0
+        
+        // Determine the position of the node
+        var position = levelData.coordinatesForGridPosition(column: startCol, row: row)
+        position = SCNVector3(x: position.x, y: 0.15, z: position.z)
+        
+        // Create node
+        let spawnNode = SCNNode()
+        spawnNode.position = position
+        
+        // Create an action to make the node spawn cars
+        let spawnAction = SCNAction.runBlock({ node in
+          
+          // TODO: Change code to create a car
+          let car = SCNNode()
+          
+          // TODO: Add the code to make the car move
+          
+        })
+        // Will spawn a new car every 5 + (random time interval up to 5 seconds)
+        let delayAction = SCNAction.waitForDuration(5.0, withRange: 5.0)
+        
+        spawnNode.runAction(SCNAction.repeatActionForever(SCNAction.sequence([delayAction, spawnAction])))
+        
+        self.rootNode.addChildNode(spawnNode)
+      }
+      
+    }
   }
   
   
@@ -159,115 +213,51 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createLevelAtPosition(#position: SCNVector3) -> SCNNode {
+  // TODO: Add code to create player here
+  func createPlayerAtPosition(#position: SCNVector3) -> SCNNode {
+    let rootNode = SCNNode()
+    rootNode.name = "Player"
+    rootNode.position = position
     
-    let levelNode = SCNNode()
+    // Create player model node
+    let playerGeometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
+    let playerMaterial = SCNMaterial()
+    playerMaterial.diffuse.contents = UIColor(red: 225.0/255.0, green: 225.0/255.0, blue: 225.0/255.0, alpha: 1.0)
+    playerMaterial.locksAmbientWithDiffuse = false
+    playerMaterial.specular.contents = UIColor.darkGrayColor()
+    playerMaterial.shininess = 0.5
+    playerGeometry.firstMaterial = playerMaterial
+    playerModelNode = SCNNode()
+    playerModelNode.geometry = playerGeometry
+    playerModelNode.name = "PlayerModel"
     
-    // Create light grass material
-    let lightGrassMaterial = SCNMaterial()
-    lightGrassMaterial.diffuse.contents = UIColor(red: 190.0/255.0, green: 244.0/255.0, blue: 104.0/255.0, alpha: 1.0)
-    lightGrassMaterial.locksAmbientWithDiffuse = false
+    // Create a physicsbody for collision detection
+    playerModelNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    playerModelNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
+    playerModelNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
     
-    // Create dark grass material
-    let darkGrassMaterial = SCNMaterial()
-    darkGrassMaterial.diffuse.contents = UIColor(red: 183.0/255.0, green: 236.0/255.0, blue: 96.0/255.0, alpha: 1.0)
-    darkGrassMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree top material
-    let treeTopMaterial = SCNMaterial()
-    treeTopMaterial.diffuse.contents = UIColor(red: 118.0/255.0, green: 141.0/255.0, blue: 25.0/255.0, alpha: 1.0)
-    treeTopMaterial.locksAmbientWithDiffuse = false
-    
-    // Create tree trunk material
-    let treeTrunkMaterial = SCNMaterial()
-    treeTrunkMaterial.diffuse.contents = UIColor(red: 185.0/255.0, green: 122.0/255.0, blue: 87.0/255.0, alpha: 1.0)
-    treeTrunkMaterial.locksAmbientWithDiffuse = false
-    
-    // Create road material
-    let roadMaterial = SCNMaterial()
-    roadMaterial.diffuse.contents = UIColor.darkGrayColor()
-    roadMaterial.diffuse.wrapT = SCNWrapMode.Repeat
-    roadMaterial.locksAmbientWithDiffuse = false
-    
-    // First, create geometry for grass and roads
-    for row in 0..<levelData.data.rowCount() {
-      
-      // HACK: Check column 5 as column 0 to 4 will always be obstacles
-      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
-      switch type {
-      case GameLevelDataType.Road:
-        
-        // Create a road row
-        let roadGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        roadGeometry.widthSegmentCount = 1
-        roadGeometry.heightSegmentCount = 1
-        roadGeometry.firstMaterial = roadMaterial
-        
-        let roadNode = SCNNode(geometry: roadGeometry)
-        roadNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        roadNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(roadNode)
-        
-        break
-        
-      default:
-        
-        // Create a grass row
-        let grassGeometry = SCNPlane(width: CGFloat(levelData.gameLevelWidth()), height: CGFloat(levelData.segmentSize))
-        grassGeometry.widthSegmentCount = 1
-        grassGeometry.heightSegmentCount = 1
-        grassGeometry.firstMaterial = row % 2 == 0 ? lightGrassMaterial : darkGrassMaterial
-        
-        let grassNode = SCNNode(geometry: grassGeometry)
-        grassNode.position = levelData.coordinatesForGridPosition(column: Int(levelData.data.columnCount() / 2), row: row)
-        grassNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
-        levelNode.addChildNode(grassNode)
-        
-        // Create obstacles
-        for col in 0..<levelData.data.columnCount() {
-          let subType = levelData.gameLevelDataTypeForGridPosition(column: col, row: row)
-          if subType == GameLevelDataType.Obstacle {
-            // Height of tree top is random
-            let treeHeight = CGFloat((arc4random_uniform(5) + 2)) / 10.0
-            let treeTopPosition = Float(treeHeight / 2.0 + 0.1)
-            
-            // Create a tree
-            let treeTopGeomtery = SCNBox(width: 0.1, height: treeHeight, length: 0.1, chamferRadius: 0.0)
-            treeTopGeomtery.firstMaterial = treeTopMaterial
-            let treeTopNode = SCNNode(geometry: treeTopGeomtery)
-            let gridPosition = levelData.coordinatesForGridPosition(column: col, row: row)
-            treeTopNode.position = SCNVector3(x: gridPosition.x, y: treeTopPosition, z: gridPosition.z)
-            levelNode.addChildNode(treeTopNode)
-            
-            let treeTrunkGeometry = SCNBox(width: 0.05, height: 0.1, length: 0.05, chamferRadius: 0.0)
-            treeTrunkGeometry.firstMaterial = treeTrunkMaterial
-            let treeTrunkNode = SCNNode(geometry: treeTrunkGeometry)
-            treeTrunkNode.position = SCNVector3(x: gridPosition.x, y: 0.05, z: gridPosition.z)
-            levelNode.addChildNode(treeTrunkNode)
-          }
-        }
-        
-        break
-      }
-    }
-    
-    // Combine all the geometry into one - this will reduce the number of draw calls and improve performance
-    let flatLevelNode = levelNode.flattenedClone()
-    flatLevelNode.name = "Level"
-    
-    return flatLevelNode
+    rootNode.addChildNode(playerModelNode)
+    return rootNode
   }
   
   
-  // TODO: Add code to create player here
+  func createSharedMaterial() -> SCNMaterial {
+    let material = SCNMaterial()
+    material.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    material.locksAmbientWithDiffuse = false
+    material.specular.contents = UIColor.darkGrayColor()
+    material.shininess = 0.5
+    return material
+  }
   
+  // TODO: Add code to create cars here
   
   
   // MARK: Game Play
   
   func didPlayerReachEndOfLevel() -> Bool {
-    //return playerGridRow == levelData.data.rowCount() - 7
-    return false
+    // TODO: Uncomment code to test for player reaching the end of level
+    return playerGridRow == levelData.data.rowCount() - 7
   }
   
   
@@ -385,6 +375,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   func handleTap(gesture: UIGestureRecognizer) {
     if let tapGesture = gesture as? UITapGestureRecognizer {
       // TODO: Add code to do movement here
+      movePlayerInDirection(MoveDirection.Forward)
     }
   }
   
@@ -395,18 +386,22 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       switch swipeGesture.direction {
       case UISwipeGestureRecognizerDirection.Up:
         // TODO: Add code to do movement here
+        movePlayerInDirection(MoveDirection.Forward)
         break
         
       case UISwipeGestureRecognizerDirection.Down:
         // TODO: Add code to do movement here
+        movePlayerInDirection(MoveDirection.Backward)
         break
         
       case UISwipeGestureRecognizerDirection.Left:
         // TODO: Add code to do movement here
+        movePlayerInDirection(MoveDirection.Left)
         break
         
       case UISwipeGestureRecognizerDirection.Right:
         // TODO: Add code to do movement here
+        movePlayerInDirection(MoveDirection.Right)
         break
         
       default:
@@ -415,6 +410,91 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     }
   }
   
-  // TODO: Add code for player movement here
+  // TODO: Uncomment code for player movement here
+  func movePlayerInDirection(direction: MoveDirection) {
+    
+    switch gameState {
+    case GameState.WaitingForFirstTap:
+      
+      // Start playing
+      switchToPlaying()
+      movePlayerInDirection(direction)
+      break
+      
+    case GameState.Playing:
+      
+      // Determine if the new position is a valid position
+      var newPlayerGridCol = playerGridCol
+      var newPlayerGridRow = playerGridRow
+      
+      switch direction {
+      case .Forward:
+        newPlayerGridRow += 1
+        break;
+      case .Backward:
+        newPlayerGridRow -= 1
+        break
+      case .Left:
+        newPlayerGridCol -= 1
+        break
+      case .Right:
+        newPlayerGridCol += 1
+      }
+      
+      // Determine the type of tile at new position
+      let type = levelData.gameLevelDataTypeForGridPosition(column: newPlayerGridCol, row: newPlayerGridRow)
+      
+      if type == GameLevelDataType.Invalid || type == GameLevelDataType.Obstacle {
+        // Invalid - do not move
+        // println("Invalid move")
+        
+      } else {
+        // Valid - move
+        // println("Valid move to \(newPlayerGridCol), \(newPlayerGridRow)")
+        
+        playerGridCol = newPlayerGridCol
+        playerGridRow = newPlayerGridRow
+        
+        // Move the player to new position
+        var newPlayerPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+        newPlayerPosition = SCNVector3(x: newPlayerPosition.x, y: 0.1, z: newPlayerPosition.z)
+        
+        // Move the player using an action
+        let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
+        let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
+        jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+        let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
+        jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+        let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
+        
+        // Play the action
+        player.runAction(moveAction)
+        playerModelNode.runAction(jumpAction)
+        
+        // Play jump sound
+        if let overlay = view.overlaySKScene {
+          overlay.runAction(soundJump)
+        }
+      }
+      
+      break
+      
+    case GameState.GameOver:
+      
+      // Switch to tutorial
+      switchToRestartLevel()
+      break
+      
+    case GameState.RestartLevel:
+      
+      // Switch to new level
+      // switchToWaitingForFirstTap()
+      break
+      
+    default:
+      break
+    }
+    
+  }
   
 }
