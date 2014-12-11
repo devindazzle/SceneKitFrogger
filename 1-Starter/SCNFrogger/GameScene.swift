@@ -37,19 +37,19 @@ struct PhysicsCategory {
 class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate {
   
   // MARK: Properties
-  var view: SCNView!
+  var sceneView: SCNView!
   var gameState = GameState.WaitingForFirstTap
   var camera: SCNNode!
   var cameraOrthographicScale = 0.5
   var cameraOffsetFromPlayer = SCNVector3(x: 0.25, y: 1.25, z: 0.55)
   var level: SCNNode!
   var levelData: GameLevel!
-  
-  // TODO: Add player properties here
+  let levelWidth: Int = 19
+  let levelHeight: Int = 50
   
   
   init(view: SCNView) {
-    self.view = view
+    sceneView = view
     super.init()
     
     initializeLevel()
@@ -62,35 +62,11 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   
   func initializeLevel() {
-    
-    // Set up gesture recognizers
-    setupGestureRecognizersForView(view)
-    
-    // Create level procedurally
-    levelData = GameLevel(width: 19, height: 50)
-    
-    // Create ambient light
-    let ambientLight = createAmbientLight()
-    self.rootNode.addChildNode(ambientLight)
-    
-    // Create omni light
-    let omniLight = createOmniLightAtPosition(position: SCNVector3(x: -10.0, y: 20, z: 10.0))
-    self.rootNode.addChildNode(omniLight)
-    
-    // TODO: Add code to initialize player here
-    
-    // TODO: Add code to create camera here
-    
-    // Create nodes for level
-    level = levelData.createLevelAtPosition(position: SCNVector3Zero)
-    self.rootNode.addChildNode(level)
-    
-    // Create cars
+    setupGestureRecognizersForView(sceneView)
+    setupLevel()
+    setupLights()
     setupCarSpawnNodes()
-    
-    // Start the game
     switchToWaitingForFirstTap()
-    
   }
   
   
@@ -121,50 +97,51 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func setupCarSpawnNodes() {
-    // For each road, place car spawn node.
-    for row in 0..<levelData.data.rowCount() {
-      
-      let type = levelData.gameLevelDataTypeForGridPosition(column: 5, row: row)
-      
-      if type == GameLevelDataType.Road {
-        
-        // Determine if the car should start from the left of the right
-        let startCol = row % 2 == 0 ? 0 : levelData.data.columnCount() - 1
-        let moveDirection : Float = row % 2 == 0 ? 1.0 : -1.0
-        
-        // Determine the position of the node
-        var position = levelData.coordinatesForGridPosition(column: startCol, row: row)
-        position = SCNVector3(x: position.x, y: 0.15, z: position.z)
-        
-        // Create node
-        let spawnNode = SCNNode()
-        spawnNode.position = position
-        
-        // Create an action to make the node spawn cars
-        let spawnAction = SCNAction.runBlock({ node in
-          
-          // TODO: Change code to create a car
-          let car = SCNNode()
-          
-          // TODO: Add the code to make the car move
-          
-        })
-        // Will spawn a new car every 5 + (random time interval up to 5 seconds)
-        let delayAction = SCNAction.waitForDuration(5.0, withRange: 5.0)
-        
-        spawnNode.runAction(SCNAction.repeatActionForever(SCNAction.sequence([delayAction, spawnAction])))
-        
-        self.rootNode.addChildNode(spawnNode)
-      }
-      
-    }
+  func setupLevel() {
+    // Create level procedurally
+    // levelData = GameLevel(width: levelWidth, height: levelHeight)
+    
+    // Create nodes for level
+    // level = levelData.createLevelAtPosition(position: SCNVector3Zero)
+    // self.rootNode.addChildNode(level)
+    
+    // Move player to start position
+    // TODO: Add code for this
+  }
+  
+  
+  func setupLights() {
+    
+    // Create ambient light
+    let ambientLight = SCNLight()
+    ambientLight.type = SCNLightTypeAmbient
+    ambientLight.color = UIColor.whiteColor()
+    let ambientLightNode = SCNNode()
+    ambientLightNode.name = "AmbientLight"
+    ambientLightNode.light = ambientLight
+    rootNode.addChildNode(ambientLightNode)
+    
+    // Create an omni-directional light
+    let omniLight = SCNLight()
+    omniLight.type = SCNLightTypeOmni
+    omniLight.color = UIColor.whiteColor()
+    let omniLightNode = SCNNode()
+    omniLightNode.name = "OmniLight"
+    omniLightNode.light = omniLight
+    omniLightNode.position = SCNVector3(x: -10.0, y: 20, z: 10.0)
+    rootNode.addChildNode(omniLightNode)
+    
+  }
+  
+  
+  func setupPlayer() {
+    
   }
   
   
   // MARK: Game Objects
   
-  func createCameraAtPosition(#position: SCNVector3) -> SCNNode {
+  func createCameraAtPosition(position: SCNVector3) -> SCNNode {
     let camera = SCNCamera()
     camera.usesOrthographicProjection = true
     camera.orthographicScale = cameraOrthographicScale
@@ -189,7 +166,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createOmniLightAtPosition(#position: SCNVector3) -> SCNNode {
+  func createOmniLightAtPosition(position: SCNVector3) -> SCNNode {
     let light = SCNLight()
     light.type = SCNLightTypeOmni
     light.color = UIColor.whiteColor()
@@ -201,19 +178,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  // TODO: Add code to create player here
-  
-  
-  func createSharedMaterial() -> SCNMaterial {
-    let material = SCNMaterial()
-    material.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
-    material.locksAmbientWithDiffuse = false
-    material.specular.contents = UIColor.darkGrayColor()
-    material.shininess = 0.5
-    return material
+  func createCarNodeAtPosition(position: SCNVector3) -> SCNNode {
+    return SCNNode()
   }
-  
-  // TODO: Add code to create cars here
   
   
   // MARK: Game Play
@@ -228,7 +195,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func switchToWaitingForFirstTap() {
     gameState = GameState.WaitingForFirstTap
-    if let overlay = view.overlaySKScene {
+    if let overlay = sceneView.overlaySKScene {
       // Remove black node
       overlay.enumerateChildNodesWithName("RestartLevel", usingBlock: { node, stop in
         node.runAction(SKAction.sequence(
@@ -247,7 +214,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       handSprite.name = "Tutorial"
       handSprite.xScale = 2.0
       handSprite.yScale = 2.0
-      handSprite.position = CGPoint(x: view.bounds.size.width/2.0, y: handSprite.size.height * 2.0)
+      handSprite.position = CGPoint(x: sceneView.bounds.size.width/2.0, y: handSprite.size.height * 2.0)
       handSprite.runAction(SKAction.repeatActionForever(handAnimation))
       overlay.addChild(handSprite)
     }
@@ -256,7 +223,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func switchToPlaying() {
     gameState = GameState.Playing
-    if let overlay = view.overlaySKScene {
+    if let overlay = sceneView.overlaySKScene {
       // Remove tutorial
       overlay.enumerateChildNodesWithName("Tutorial", usingBlock: { node, stop in
         node.runAction(SKAction.sequence(
@@ -269,13 +236,13 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func switchToGameOver() {
     gameState = GameState.GameOver
-    if let overlay = view.overlaySKScene {
+    if let overlay = sceneView.overlaySKScene {
       let gameOverLabel = SKLabelNode(fontNamed: "Early-GameBoy")
       gameOverLabel.name = "GameOver"
       gameOverLabel.text = "Game Over"
       gameOverLabel.fontSize = 24
       gameOverLabel.fontColor = SKColor.whiteColor()
-      gameOverLabel.position = CGPoint(x: view.bounds.size.width/2.0, y: view.bounds.size.height/2.0)
+      gameOverLabel.position = CGPoint(x: sceneView.bounds.size.width/2.0, y: sceneView.bounds.size.height/2.0)
       overlay.addChild(gameOverLabel)
       
       let clickToRestartLabel = SKLabelNode(fontNamed: "Early-GameBoy")
@@ -291,7 +258,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func switchToRestartLevel() {
     gameState = GameState.RestartLevel
-    if let overlay = view.overlaySKScene {
+    if let overlay = sceneView.overlaySKScene {
       overlay.enumerateChildNodesWithName("GameOver", usingBlock: { node, stop in
         node.runAction(SKAction.sequence(
           [SKAction.fadeOutWithDuration(0.25),
@@ -302,14 +269,14 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       let blackNode = SKSpriteNode(color: UIColor.blackColor(), size: overlay.frame.size)
       blackNode.name = "RestartLevel"
       blackNode.alpha = 0.0
-      blackNode.position = CGPoint(x: view.bounds.size.width/2.0, y: view.bounds.size.height/2.0)
+      blackNode.position = CGPoint(x: sceneView.bounds.size.width/2.0, y: sceneView.bounds.size.height/2.0)
       overlay.addChild(blackNode)
       blackNode.runAction(SKAction.sequence([SKAction.fadeInWithDuration(0.5), SKAction.runBlock({
         // self.rootNode.removeAllActions()
-        let newScene = GameScene(view: self.view)
+        let newScene = GameScene(view: self.sceneView)
         newScene.physicsWorld.contactDelegate = newScene
-        self.view.scene = newScene
-        self.view.delegate = newScene
+        self.sceneView.scene = newScene
+        self.sceneView.delegate = newScene
       })]))
     }
   }
@@ -326,7 +293,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
-    // Player got hit by a car - Game over man
+    // Player got hit by a car - Game over man, game over!
     if gameState == GameState.Playing {
       switchToGameOver()
     }
@@ -337,7 +304,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func handleTap(gesture: UIGestureRecognizer) {
     if let tapGesture = gesture as? UITapGestureRecognizer {
-      // TODO: Add code to do movement here
+      
     }
   }
   
@@ -347,19 +314,15 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     if let swipeGesture = gesture as? UISwipeGestureRecognizer {
       switch swipeGesture.direction {
       case UISwipeGestureRecognizerDirection.Up:
-        // TODO: Add code to do movement here
         break
         
       case UISwipeGestureRecognizerDirection.Down:
-        // TODO: Add code to do movement here
         break
         
       case UISwipeGestureRecognizerDirection.Left:
-        // TODO: Add code to do movement here
         break
         
       case UISwipeGestureRecognizerDirection.Right:
-        // TODO: Add code to do movement here
         break
         
       default:
@@ -368,7 +331,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     }
   }
   
-  // TODO: Uncomment code for player movement here
+  
   /* func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
