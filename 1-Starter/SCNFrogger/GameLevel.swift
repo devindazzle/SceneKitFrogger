@@ -168,6 +168,8 @@ class GameLevel: Printable {
         roadNode.rotation = SCNVector4(x: 1.0, y: 0.0, z: 0.0, w: -3.1415 / 2.0)
         levelNode.addChildNode(roadNode)
         
+        println("Remember to add code for placing car spawn nodes here")
+        
         break
         
       default:

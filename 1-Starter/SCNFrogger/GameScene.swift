@@ -63,9 +63,10 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   
   func initializeLevel() {
     setupGestureRecognizersForView(sceneView)
-    setupLevel()
     setupLights()
-    setupCarSpawnNodes()
+    setupPlayer()
+    setupCamera()
+    setupLevel()
     switchToWaitingForFirstTap()
   }
   
@@ -94,19 +95,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
     let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
     swipeRightGesture.direction = UISwipeGestureRecognizerDirection.Right
     view.addGestureRecognizer(swipeRightGesture)
-  }
-  
-  
-  func setupLevel() {
-    // Create level procedurally
-    // levelData = GameLevel(width: levelWidth, height: levelHeight)
-    
-    // Create nodes for level
-    // level = levelData.createLevelAtPosition(position: SCNVector3Zero)
-    // self.rootNode.addChildNode(level)
-    
-    // Move player to start position
-    // TODO: Add code for this
   }
   
   
@@ -139,6 +127,16 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
+  func setupCamera() {
+    
+  }
+  
+  
+  func setupLevel() {
+    
+  }
+  
+  
   // MARK: Game Objects
   
   func createCameraAtPosition(position: SCNVector3) -> SCNNode {
@@ -155,36 +153,10 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
   }
   
   
-  func createAmbientLight() -> SCNNode {
-    let light = SCNLight()
-    light.type = SCNLightTypeAmbient
-    light.color = UIColor.whiteColor()
-    let lightNode = SCNNode()
-    lightNode.name = "AmbientLight"
-    lightNode.light = light
-    return lightNode
-  }
-  
-  
-  func createOmniLightAtPosition(position: SCNVector3) -> SCNNode {
-    let light = SCNLight()
-    light.type = SCNLightTypeOmni
-    light.color = UIColor.whiteColor()
-    let lightNode = SCNNode()
-    lightNode.name = "OmniLight"
-    lightNode.light = light
-    lightNode.position = position
-    return lightNode
-  }
-  
-  
-  func createCarNodeAtPosition(position: SCNVector3) -> SCNNode {
-    return SCNNode()
-  }
-  
-  
   // MARK: Game Play
   
+  
+  // TODO: Is this method needed??? It is referenced in just one place
   func didPlayerReachEndOfLevel() -> Bool {
     // TODO: Uncomment code to test for player reaching the end of level
     return false // playerGridRow == levelData.data.rowCount() - 7
@@ -367,11 +339,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       
       if type == GameLevelDataType.Invalid || type == GameLevelDataType.Obstacle {
         // Invalid - do not move
-        // println("Invalid move")
         
       } else {
         // Valid - move
-        // println("Valid move to \(newPlayerGridCol), \(newPlayerGridRow)")
         
         playerGridCol = newPlayerGridCol
         playerGridRow = newPlayerGridRow
