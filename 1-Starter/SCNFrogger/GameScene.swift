@@ -225,7 +225,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       clickToRestartLabel.position = CGPoint(x: gameOverLabel.position.x, y: gameOverLabel.position.y - 24.0)
       overlay.addChild(clickToRestartLabel)
     }
-    self.physicsWorld.contactDelegate = nil
+    physicsWorld.contactDelegate = nil
   }
   
   func switchToRestartLevel() {
@@ -244,7 +244,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate 
       blackNode.position = CGPoint(x: sceneView.bounds.size.width/2.0, y: sceneView.bounds.size.height/2.0)
       overlay.addChild(blackNode)
       blackNode.runAction(SKAction.sequence([SKAction.fadeInWithDuration(0.5), SKAction.runBlock({
-        // self.rootNode.removeAllActions()
         let newScene = GameScene(view: self.sceneView)
         newScene.physicsWorld.contactDelegate = newScene
         self.sceneView.scene = newScene
