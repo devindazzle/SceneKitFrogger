@@ -25,6 +25,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   let levelWidth: Int = 19
   let levelHeight: Int = 50
   
+  var player: SCNNode!
+  
   
   // MARK: Init
   init(view: SCNView) {
@@ -50,17 +52,39 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func setupPlayer() {
+    player = SCNNode()
+    player.name = "Player"
+    player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
+    player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
     
+    let playerMaterial = SCNMaterial()
+    playerMaterial.diffuse.contents = UIColor.lightGrayColor()
+    playerMaterial.locksAmbientWithDiffuse = false
+    player.geometry!.firstMaterial = playerMaterial
+    
+    rootNode.addChildNode(player)
   }
   
   
   func setupCamera() {
+    camera = SCNNode()
+    camera.name = "Camera"
+    camera.position = cameraOffsetFromPlayer
+    camera.camera = SCNCamera()
+    camera.camera!.usesOrthographicProjection = true
+    camera.camera!.orthographicScale = cameraOrthographicScale
+    camera.camera!.zNear = 0.05
+    camera.camera!.zFar = 150.0
+    rootNode.addChildNode(camera)
     
+    camera.constraints = [SCNLookAtConstraint(target: player)]
   }
   
   
   func setupLevel() {
-    
+    //levelData = GameLevel(width: levelWidth, height: levelHeight)
+    //levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
+    //levelData.spawnDelegate = self
   }
   
   
@@ -212,7 +236,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func spawnCarAtPosition(position: SCNVector3) {
-    
+    println("Spawn car at position (\(position.x), \(position.y), \(position.z))")
   }
   
   
