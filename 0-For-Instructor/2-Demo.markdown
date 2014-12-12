@@ -82,7 +82,7 @@ Build and run. Camera now gives an isometric view
 
 The 3D models you will be using in this tutorial are placed in the folder **Models** in the **assets.scnassets** folder.
 
-The models were made using MagicaVoxel and Blender. These applications are both free and open souce. You will find links to these applications at the bottom of this file in case you want to make your own models later.
+The models were made using MagicaVoxel and Blender. These applications are both free and open source. You will find links to these applications at the bottom of this file in case you want to make your own models later.
 
 At the top of **GameScene.swift**, add to bottom of the list of properties:
 
@@ -94,7 +94,9 @@ Go to `setupPlayer()` and modify the `line player = SCNNode()` to the following:
 	
 Delete the following line:
 
-	player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)****
+	player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
+	
+Build and run. The frog now looks (sort of) like a frog.
 
 ## 8) Assigning a texture to the geometry
 
@@ -106,6 +108,8 @@ to:
 
 	playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
 
+Build and run. The frog is now textured and green.
+
 ## 9) Adding the level
 
 In setupLevel(), add the following code:
@@ -113,6 +117,8 @@ In setupLevel(), add the following code:
 	levelData = GameLevel(width: levelWidth, height: levelHeight)
 	levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
 	levelData.spawnDelegate = self
+	
+Build and run. Now the level is generated.
 
 ## 10) Positioning the player in the level
 
@@ -128,6 +134,8 @@ Go to setupPlayer and change the line:
 to:
 
 	player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+	
+Build and run. Now the player is correctly positioned in the level
 	
 ## 11) That's it!
 

@@ -395,7 +395,7 @@ rootNode.addChildNode(camera)
 
 <p>The 3D models you will be using in this tutorial are placed in the folder <strong>Models</strong> in the <strong>assets.scnassets</strong> folder.</p>
 
-<p>The models were made using MagicaVoxel and Blender. These applications are both free and open souce. You will find links to these applications at the bottom of this file in case you want to make your own models later.</p>
+<p>The models were made using MagicaVoxel and Blender. These applications are both free and open source. You will find links to these applications at the bottom of this file in case you want to make your own models later.</p>
 
 <p>At the top of <strong>GameScene.swift</strong>, add to bottom of the list of properties:</p>
 
@@ -409,8 +409,10 @@ rootNode.addChildNode(camera)
 
 <p>Delete the following line:</p>
 
-<pre><code>player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)****
+<pre><code>player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
 </code></pre>
+
+<p>Build and run. The frog now looks (sort of) like a frog.</p>
 
 <h2 id="toc_8">8) Assigning a texture to the geometry</h2>
 
@@ -424,6 +426,8 @@ rootNode.addChildNode(camera)
 <pre><code>playerMaterial.diffuse.contents = UIImage(named: &quot;assets.scnassets/Textures/model_texture.tga&quot;)
 </code></pre>
 
+<p>Build and run. The frog is now textured and green.</p>
+
 <h2 id="toc_9">9) Adding the level</h2>
 
 <p>In setupLevel(), add the following code:</p>
@@ -432,6 +436,8 @@ rootNode.addChildNode(camera)
 levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
 levelData.spawnDelegate = self
 </code></pre>
+
+<p>Build and run. Now the level is generated.</p>
 
 <h2 id="toc_10">10) Positioning the player in the level</h2>
 
@@ -450,6 +456,8 @@ var playerGridRow = 6
 
 <pre><code>player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
 </code></pre>
+
+<p>Build and run. Now the player is correctly positioned in the level</p>
 
 <h2 id="toc_11">11) That&#39;s it!</h2>
 
