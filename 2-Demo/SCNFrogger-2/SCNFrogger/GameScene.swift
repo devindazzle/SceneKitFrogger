@@ -26,6 +26,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   let levelHeight: Int = 50
   
   var player: SCNNode!
+  let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
+  var playerGridCol = 7
+  var playerGridRow = 6
   
   
   // MARK: Init
@@ -44,21 +47,22 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func initializeLevel() {
     setupGestureRecognizersForView(sceneView)
     setupLights()
+    setupLevel()
     setupPlayer()
     setupCamera()
-    setupLevel()
     switchToWaitingForFirstTap()
   }
   
   
   func setupPlayer() {
-    player = SCNNode()
+    player = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)
     player.name = "Player"
-    player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
-    player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
+    // player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
+    // player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
+    player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
     
     let playerMaterial = SCNMaterial()
-    playerMaterial.diffuse.contents = UIColor.lightGrayColor()
+    playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
     playerMaterial.locksAmbientWithDiffuse = false
     player.geometry!.firstMaterial = playerMaterial
     
@@ -82,9 +86,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func setupLevel() {
-    //levelData = GameLevel(width: levelWidth, height: levelHeight)
-    //levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
-    //levelData.spawnDelegate = self
+    levelData = GameLevel(width: levelWidth, height: levelHeight)
+    levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
+    levelData.spawnDelegate = self
   }
   
   
@@ -236,7 +240,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func spawnCarAtPosition(position: SCNVector3) {
-    println("Spawn car at position (\(position.x), \(position.y), \(position.z))")
+    
   }
   
   
@@ -318,12 +322,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
         newPlayerPosition = SCNVector3(x: newPlayerPosition.x, y: 0.1, z: newPlayerPosition.z)
         
         // Move the player using an action
-        let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
-        let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
-        jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
-        let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
-        jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
-        let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
+        
         
         // Play the action
         player.runAction(moveAction)

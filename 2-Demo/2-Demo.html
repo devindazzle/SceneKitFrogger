@@ -306,8 +306,9 @@ sup {
 <body>
 <h1 id="toc_0">208: Scene Kit, Part 2: Demo Instructions</h1>
 
-<p>In this demo, you will add some basic gameplay elements to SCNFrogger.
-The steps here will be explained in the demo, but here are the raw steps in case you miss a step or get stuck.</p>
+<p>In this demo, you will prepare the scene for SCNFrogger so that it is ready for adding gameplay.</p>
+
+<p>The steps here will be explained in the demo, but here are the raw steps in case you miss a step or get stuck.</p>
 
 <h2 id="toc_1">1) Prepare project</h2>
 
@@ -386,20 +387,82 @@ rootNode.addChildNode(camera)
 <p>Still in <code>setupCamera</code>, add the following at the end of the method:</p>
 
 <pre><code>camera.constraints = [SCNLookAtConstraint(target: player)]
+
+Build and run. Camera now gives an isometric view
 </code></pre>
 
-<p>The camera will now look at the player and the scene now has an isometric view.</p>
+<h2 id="toc_7">7) Loading geometry from a file</h2>
 
-<h2 id="toc_7">7) Disabling default camera controls</h2>
+<p>The 3D models you will be using in this tutorial are placed in the folder <strong>Models</strong> in the <strong>assets.scnassets</strong> folder.</p>
 
-<p>Open <strong>GameViewContoller.swift</strong> in the <strong>Helpers</strong> group and remove the default camera controls by deleting the following line:</p>
+<p>The models were made using MagicaVoxel and Blender. These applications are both free and open souce. You will find links to these applications at the bottom of this file in case you want to make your own models later.</p>
 
-<pre><code>scnView.allowsCameraControl = true
+<p>At the top of <strong>GameScene.swift</strong>, add to bottom of the list of properties:</p>
+
+<pre><code>let playerScene = SCNScene(named: &quot;assets.scnassets/Models/frog.dae&quot;)
 </code></pre>
 
-<h2 id="toc_8">8) Adding movement with gestures</h2>
+<p>Go to <code>setupPlayer()</code> and modify the <code>line player = SCNNode()</code> to the following:</p>
 
-<p>SS</p>
+<pre><code>player = playerScene!.rootNode.childNodeWithName(&quot;Frog&quot;, recursively: false)
+</code></pre>
+
+<p>Delete the following line:</p>
+
+<pre><code>player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)****
+</code></pre>
+
+<h2 id="toc_8">8) Assigning a texture to the geometry</h2>
+
+<p>Still in <code>setupPlayer()</code>, change the line</p>
+
+<pre><code>playerMaterial.diffuse.contents = UIColor.lightGrayColor()
+</code></pre>
+
+<p>to:</p>
+
+<pre><code>playerMaterial.diffuse.contents = UIImage(named: &quot;assets.scnassets/Textures/model_texture.tga&quot;)
+</code></pre>
+
+<h2 id="toc_9">9) Adding the level</h2>
+
+<p>In setupLevel(), add the following code:</p>
+
+<pre><code>levelData = GameLevel(width: levelWidth, height: levelHeight)
+levelData.setupLevelAtPosition(SCNVector3Zero, parentNode: rootNode)
+levelData.spawnDelegate = self
+</code></pre>
+
+<h2 id="toc_10">10) Positioning the player in the level</h2>
+
+<p>Go back to <strong>GameScene.swift</strong>, and add to bottom of the list of properties:</p>
+
+<pre><code>var playerGridCol = 7
+var playerGridRow = 6
+</code></pre>
+
+<p>Go to setupPlayer and change the line:</p>
+
+<pre><code>player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
+</code></pre>
+
+<p>to:</p>
+
+<pre><code>player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+</code></pre>
+
+<h2 id="toc_11">11) That&#39;s it!</h2>
+
+<p>Congrats, at this time you should have the scene set up for adding movement to the game and learned a lot about Scene Kit along the way. You are now ready for the Lab.</p>
+
+<h2 id="toc_12">12) Links to applications</h2>
+
+<p>The applications used for creating the 3D models in this tutorial can be found here:</p>
+
+<ul>
+<li>MagicaVoxel: <a href="">https://voxel.codeplex.com/</a></li>
+<li>Blender: <a href="">http://www.blender.org/</a></li>
+</ul>
 
 
 </body>

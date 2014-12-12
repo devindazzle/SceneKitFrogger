@@ -42,9 +42,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func initializeLevel() {
     setupGestureRecognizersForView(sceneView)
     setupLights()
+    setupLevel()
     setupPlayer()
     setupCamera()
-    setupLevel()
     switchToWaitingForFirstTap()
   }
   
@@ -294,12 +294,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
         newPlayerPosition = SCNVector3(x: newPlayerPosition.x, y: 0.1, z: newPlayerPosition.z)
         
         // Move the player using an action
-        let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
-        let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
-        jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
-        let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
-        jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
-        let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
+        
         
         // Play the action
         player.runAction(moveAction)
