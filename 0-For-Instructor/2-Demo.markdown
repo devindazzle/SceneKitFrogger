@@ -76,7 +76,7 @@ Still in `setupCamera`, add the following at the end of the method:
 
 	camera.constraints = [SCNLookAtConstraint(target: player)]
 	
-	Build and run. Camera now gives an isometric view
+Build and run. Camera now gives an isometric view
 
 ## 7) Loading geometry from a file
 
