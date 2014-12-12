@@ -247,7 +247,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   // MARK: Touch Handling
   func handleTap(gesture: UIGestureRecognizer) {
     if let tapGesture = gesture as? UITapGestureRecognizer {
-      
+      movePlayerInDirection(.Forward)
     }
   }
   
@@ -256,15 +256,19 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     if let swipeGesture = gesture as? UISwipeGestureRecognizer {
       switch swipeGesture.direction {
       case UISwipeGestureRecognizerDirection.Up:
+        movePlayerInDirection(.Forward)
         break
         
       case UISwipeGestureRecognizerDirection.Down:
+        movePlayerInDirection(.Backward)
         break
         
       case UISwipeGestureRecognizerDirection.Left:
+        movePlayerInDirection(.Left)
         break
         
       case UISwipeGestureRecognizerDirection.Right:
+        movePlayerInDirection(.Right)
         break
         
       default:
@@ -275,64 +279,18 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   // MARK: Player movement
-  /* func movePlayerInDirection(direction: MoveDirection) {
+  func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
     case GameState.WaitingForFirstTap:
       
       // Start playing
       switchToPlaying()
-      movePlayerInDirection(direction)
       break
       
     case GameState.Playing:
       
-      // Determine if the new position is a valid position
-      var newPlayerGridCol = playerGridCol
-      var newPlayerGridRow = playerGridRow
-      
-      switch direction {
-      case .Forward:
-        newPlayerGridRow += 1
-        break;
-      case .Backward:
-        newPlayerGridRow -= 1
-        break
-      case .Left:
-        newPlayerGridCol -= 1
-        break
-      case .Right:
-        newPlayerGridCol += 1
-      }
-      
-      // Determine the type of tile at new position
-      let type = levelData.gameLevelDataTypeForGridPosition(column: newPlayerGridCol, row: newPlayerGridRow)
-      
-      if type == GameLevelDataType.Invalid || type == GameLevelDataType.Obstacle {
-        // Invalid - do not move
-        
-      } else {
-        // Valid - move
-        
-        playerGridCol = newPlayerGridCol
-        playerGridRow = newPlayerGridRow
-        
-        // Move the player to new position
-        var newPlayerPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
-        newPlayerPosition = SCNVector3(x: newPlayerPosition.x, y: 0.1, z: newPlayerPosition.z)
-        
-        // Move the player using an action
-        
-        
-        // Play the action
-        player.runAction(moveAction)
-        playerModelNode.runAction(jumpAction)
-        
-        // Play jump sound
-        if let overlay = view.overlaySKScene {
-          overlay.runAction(soundJump)
-        }
-      }
+      // Check for player movement
       
       break
       
@@ -352,6 +310,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       break
     }
     
-  } */
+  }
   
 }
