@@ -254,25 +254,25 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
-    case GameState.WaitingForFirstTap:
+    case .WaitingForFirstTap:
       
       // Start playing
       switchToPlaying()
       break
       
-    case GameState.Playing:
+    case .Playing:
       
       // Check for player movement
       
       break
       
-    case GameState.GameOver:
+    case .GameOver:
       
       // Switch to tutorial
       switchToRestartLevel()
       break
       
-    case GameState.RestartLevel:
+    case .RestartLevel:
       
       // Switch to new level
       // switchToWaitingForFirstTap()

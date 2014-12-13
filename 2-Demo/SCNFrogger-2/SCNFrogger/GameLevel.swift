@@ -107,6 +107,40 @@ class GameLevel: Printable {
   }
   
   
+  func gridColumnAndRowAfterMoveInDirection(direction: MoveDirection, currentGridColumn: Int, currentGridRow: Int) -> (didMove: Bool, newGridColumn: Int, newGridRow: Int) {
+    
+    // Calculate the new grid position after the move
+    var newGridColumn = currentGridColumn
+    var newGridRow = currentGridRow
+    
+    switch direction {
+    case .Forward:
+      newGridRow += 1
+      break;
+    case .Backward:
+      newGridRow -= 1
+      break
+    case .Left:
+      newGridColumn -= 1
+      break
+    case .Right:
+      newGridColumn += 1
+    }
+    
+    // Determine the type of data at new position
+    let type = gameLevelDataTypeForGridPosition(column: newGridColumn, row: newGridRow)
+    
+    switch type {
+    case .Invalid, .Obstacle:
+      // Cannot move here, so return the column and row passed.
+      return (false, currentGridColumn, currentGridRow)
+    default:
+      // Move is valid, so return the new column and row
+      return (true, newGridColumn, newGridRow)
+    }
+  }
+  
+  
   func gameLevelDataTypeForGridPosition(#column: Int, row: Int) -> GameLevelDataType {
     // Raise an error is the column or row is out of bounds
     if column < 0 || column > data.columnCount() - 1 || row < 0 || row > data.rowCount() - 1 {

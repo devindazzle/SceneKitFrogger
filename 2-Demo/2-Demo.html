@@ -412,6 +412,11 @@ rootNode.addChildNode(camera)
 <pre><code>player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
 </code></pre>
 
+<p>After <code>player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)</code> add the following:</p>
+
+<pre><code>player.position.y = 0.2
+</code></pre>
+
 <p>Build and run. The frog now looks (sort of) like a frog.</p>
 
 <h2 id="toc_8">8) Assigning a texture to the geometry</h2>

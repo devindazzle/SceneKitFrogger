@@ -96,6 +96,10 @@ Delete the following line:
 
 	player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
 	
+After `player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)` add the following:
+
+	player.position.y = 0.2
+
 Build and run. The frog now looks (sort of) like a frog.
 
 ## 8) Assigning a texture to the geometry

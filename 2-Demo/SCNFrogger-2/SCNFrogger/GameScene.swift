@@ -57,9 +57,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func setupPlayer() {
     player = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)
     player.name = "Player"
-    // player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
-    // player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
     player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+    player.position.y = 0.2
     
     let playerMaterial = SCNMaterial()
     playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
@@ -282,28 +281,28 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
-    case GameState.WaitingForFirstTap:
+    case .WaitingForFirstTap:
       
       // Start playing
       switchToPlaying()
       break
       
-    case GameState.Playing:
+    case .Playing:
       
       // Check for player movement
       
       break
       
-    case GameState.GameOver:
+    case .GameOver:
       
       // Switch to tutorial
       switchToRestartLevel()
       break
       
-    case GameState.RestartLevel:
+    case .RestartLevel:
       
       // Switch to new level
-      // switchToWaitingForFirstTap()
+      switchToWaitingForFirstTap()
       break
       
     default:

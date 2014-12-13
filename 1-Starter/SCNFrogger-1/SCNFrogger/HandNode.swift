@@ -14,6 +14,8 @@ class HandNode : SKNode {
     
     super.init()
     
+    name = "Tutorial"
+    
     // Load textures
     let handTexture = SKTexture(imageNamed:"assets.scnassets/Textures/hand.png")
     handTexture.filteringMode = SKTextureFilteringMode.Nearest
@@ -25,7 +27,6 @@ class HandNode : SKNode {
     
     // Create a sprite node abd animate it
     let handSprite = SKSpriteNode(texture: handTexture)
-    handSprite.name = "Tutorial"
     handSprite.xScale = 2.0
     handSprite.yScale = 2.0
     handSprite.runAction(SKAction.repeatActionForever(handAnimation))

@@ -57,9 +57,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func setupPlayer() {
     player = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)
     player.name = "Player"
-    // player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
-    // player.position = SCNVector3(x: 0.0, y: 0.05, z: -1.5)
     player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+    player.position.y = 0.2
     
     let playerMaterial = SCNMaterial()
     playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
@@ -79,7 +78,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     camera.camera!.orthographicScale = cameraOrthographicScale
     camera.camera!.zNear = 0.05
     camera.camera!.zFar = 150.0
-    rootNode.addChildNode(camera)
+    player.addChildNode(camera)
     
     camera.constraints = [SCNLookAtConstraint(target: player)]
   }
@@ -282,31 +281,51 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   func movePlayerInDirection(direction: MoveDirection) {
     
     switch gameState {
-    case GameState.WaitingForFirstTap:
+    case .WaitingForFirstTap:
       
       // Start playing
       switchToPlaying()
       break
       
-    case GameState.Playing:
+    case .Playing:
       
-      // Check for player movement
+      // 1 - Check for player movement
+      let gridColumnAndRowAfterMove = levelData.gridColumnAndRowAfterMoveInDirection(direction, currentGridColumn: playerGridCol, currentGridRow: playerGridRow)
+      
+      if gridColumnAndRowAfterMove.didMove == false {
+        return
+      }
+      
+      // 2 - Set the new player grid position
+      playerGridCol = gridColumnAndRowAfterMove.newGridColumn
+      playerGridRow = gridColumnAndRowAfterMove.newGridRow
+      
+      // 3 - Calculate the coordinates for the player after the move
+      var newPlayerPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+      newPlayerPosition.y = 0.2
+      
+      // 4 - Move player
+      let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
+      let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.4, z: 0.0), duration: 0.1)
+      jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+      let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.4, z: 0.0), duration: 0.1)
+      jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+      let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
+      
+      player.runAction(SCNAction.group([moveAction, jumpAction]))
       
       break
       
-    case GameState.GameOver:
+    case .GameOver:
       
       // Switch to tutorial
       switchToRestartLevel()
       break
       
-    case GameState.RestartLevel:
+    case .RestartLevel:
       
       // Switch to new level
-      // switchToWaitingForFirstTap()
-      break
-      
-    default:
+      switchToWaitingForFirstTap()
       break
     }
     

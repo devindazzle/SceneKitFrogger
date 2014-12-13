@@ -12,8 +12,8 @@ class LabelNode : SKNode {
   
   init(position: CGPoint, size: CGFloat, color: SKColor, text: String, name: String) {
     super.init()
+    self.name = name
     let label = SKLabelNode(fontNamed: "Early-GameBoy")
-    label.name = name
     label.text = text
     label.fontSize = size
     label.fontColor = color
