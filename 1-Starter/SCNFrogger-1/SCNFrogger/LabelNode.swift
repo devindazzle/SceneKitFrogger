@@ -8,16 +8,18 @@
 
 import SpriteKit
 
-class LabelNode : SKNode {
+class LabelNode : SKLabelNode {
   
   init(position: CGPoint, size: CGFloat, color: SKColor, text: String, name: String) {
     super.init()
+    
     self.name = name
-    let label = SKLabelNode(fontNamed: "Early-GameBoy")
-    label.text = text
-    label.fontSize = size
-    label.fontColor = color
-    addChild(label)
+    self.text = text
+    self.position = position
+    
+    fontName = "Early-Gameboy"
+    fontSize = size
+    fontColor = color
   }
   
   required init?(coder aDecoder: NSCoder) {

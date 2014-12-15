@@ -258,6 +258,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       
       // Start playing
       switchToPlaying()
+      movePlayerInDirection(direction)
       break
       
     case .Playing:

@@ -29,6 +29,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
   var playerGridCol = 7
   var playerGridRow = 6
+  var playerChildNode: SCNNode!
   
   
   // MARK: Init
@@ -55,7 +56,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func setupPlayer() {
-    player = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)
+    player = SCNNode()
     player.name = "Player"
     player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
     player.position.y = 0.2
@@ -63,7 +64,12 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     let playerMaterial = SCNMaterial()
     playerMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
     playerMaterial.locksAmbientWithDiffuse = false
-    player.geometry!.firstMaterial = playerMaterial
+    
+    playerChildNode = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)!
+    playerChildNode.geometry!.firstMaterial = playerMaterial
+    playerChildNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.075)
+    
+    player.addChildNode(playerChildNode)
     
     rootNode.addChildNode(player)
   }
@@ -180,7 +186,7 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     if let overlay = sceneView.overlaySKScene {
       
       let gameOverLabel = LabelNode(
-        position: CGPoint(x: sceneView.bounds.size.width/2.0, y: sceneView.bounds.size.height/2.0),
+        position: CGPoint(x: overlay.size.width/2.0, y: overlay.size.height/2.0),
         size: 24, color: .whiteColor(),
         text: "Game Over",
         name: "GameOver")
@@ -229,7 +235,10 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   // MARK: Delegates
   func renderer(aRenderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: NSTimeInterval) {
-    
+    if gameState == GameState.Playing && playerGridRow == levelData.data.rowCount() - 6 {
+      // player completed the level
+      switchToGameOver()
+    }
   }
   
   
@@ -285,6 +294,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       
       // Start playing
       switchToPlaying()
+      movePlayerInDirection(direction)
+      
       break
       
     case .Playing:
@@ -306,13 +317,14 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       
       // 4 - Move player
       let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
-      let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.4, z: 0.0), duration: 0.1)
-      jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
-      let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.4, z: 0.0), duration: 0.1)
-      jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+      let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
+      jumpUpAction.timingMode = SCNActionTimingMode.EaseOut
+      let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
+      jumpDownAction.timingMode = SCNActionTimingMode.EaseIn
       let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
       
-      player.runAction(SCNAction.group([moveAction, jumpAction]))
+      player.runAction(moveAction)
+      playerChildNode.runAction(jumpAction)
       
       break
       
