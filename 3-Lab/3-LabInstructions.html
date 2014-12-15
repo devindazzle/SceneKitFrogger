@@ -304,6 +304,186 @@ sup {
 </style>
 </head>
 <body>
+<h1 id="toc_0">208: Scene Kit, Part 3: Lab Instructions</h1>
+
+<p>At this point, you have the basic structure of the game set up for SCNFrogger but there is no way to move the frog around the level. That is what you will do in the Lab.</p>
+
+<p>All the changes to the game you will make in the Lab will be in <strong>GameScene.swift</strong>.</p>
+
+<h2 id="toc_1">Adjusting the camera</h2>
+
+<p>You&#39;ll start by adjusting the camera to follow the player. In <code>setupCamera()</code>, change the line <code>rootNode.addChildNode(camera)</code> to:</p>
+
+<pre><code>player.addChildNode(camera)
+</code></pre>
+
+<p>This makes the camera a child node of the player which will make the camera move when the player (parent) node moves.</p>
+
+<p>The effect will not be noticable until you are able to move the player. That will be your next task.</p>
+
+<h2 id="toc_2">Making a move</h2>
+
+<p>Add this to the <code>.Playing</code> case inside the switch statement in <code>movePlayerInDirection(direction:)</code>:</p>
+
+<pre><code>// 1 - Check for player movement
+let gridColumnAndRowAfterMove = levelData.gridColumnAndRowAfterMoveInDirection(direction, currentGridColumn: playerGridCol, currentGridRow: playerGridRow)
+
+if gridColumnAndRowAfterMove.didMove == false {
+    return
+}
+
+// 2 - Set the new player grid position
+playerGridCol = gridColumnAndRowAfterMove.newGridColumn
+playerGridRow = gridColumnAndRowAfterMove.newGridRow
+
+// 3 - Calculate the scene coordinates for the player after the move
+var newPlayerPosition = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+newPlayerPosition.y = 0.2
+
+// 4 - Move player
+let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
+let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
+jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
+jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
+
+player.runAction(SCNAction.group([moveAction, jumpAction]))
+</code></pre>
+
+<p>There is a lot of code here, so let&#39;s go through it step-by-step:</p>
+
+<ol>
+<li><p>This uses a convinience method in the <strong>GameLevel</strong> class in the Helpers group to check if the player can move in the given direction from the current grid position. The method returns a tuple that contains information about the success of the move as well as the grid coordinate the user should move to. If the move was unsuccessful (<code>didMove == false</code>) then no further will be done and it just returns.</p></li>
+<li><p>As the move was a success the new grid column and row returned in the tuple from step 1 is stored for the player.</p></li>
+<li><p>Based on the new grid position, the scene coordinates are calculated using another convinience method in the <strong>GameLevel</strong> class. This will only return the x and z coordinates so the y-coordinate has to be set manually.</p></li>
+<li><p>Last, you define and run a set of actions. <code>moveAction</code> will move the player to the new scene coordinates you calculated in step 3. Frogs don&#39;t crawl, so you also define two actions (<code>jumpUpAction</code>, <code>jumpDownAction</code>) that will bounce the player giving the illusion of the frog jumping.</p></li>
+</ol>
+
+<p>Note that you set the timing mode on the jump actions to Ease Out (start fast, get slower over time) and Ease In (start slow, get faster over time) for a more natural curve.</p>
+
+<p>Do another build and run and move the frog around. Something is clearly wrong with the camera. When the frog moves it looks like the level bounces and not the frog. What gives?</p>
+
+<h2 id="toc_3">Jumpy-camera</h2>
+
+<p>Remember when you made the camera a child of the player in the first part of the Lab? That is the reason for the visual odd-behavior.</p>
+
+<p>The simple explanation is, when the player jumps, the camera also jumps. Therefore, from the view of the camera, the player did not move, but everything else did.</p>
+
+<p>To fix this, you need to make some adjustments to how you set up the player. </p>
+
+<p>At the top of <strong>GameScene.swift</strong>, add the following property:</p>
+
+<pre><code>var playerChildNode: SCNNode!
+</code></pre>
+
+<p>Then go to <code>setupPlayer()</code>, and modify it to look like the following:</p>
+
+<pre><code>func setupPlayer() {
+    // 1 - Player is now just a simple node with no geometry
+    player = SCNNode()
+    player.name = &quot;Player&quot;
+    player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
+    player.position.y = 0.2
+
+    let playerMaterial = SCNMaterial()
+    playerMaterial.diffuse.contents = UIImage(named: &quot;assets.scnassets/Textures/model_texture.tga&quot;)
+    playerMaterial.locksAmbientWithDiffuse = false
+
+    // 2 - Create a second node containing the geometry and assign the material to the geometry of the second node.
+    playerChildNode = playerScene!.rootNode.childNodeWithName(&quot;Frog&quot;, recursively: false)!
+    playerChildNode.geometry!.firstMaterial = playerMaterial
+    playerChildNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.075)
+
+    // 3 - Add the second node as a child node of the player node
+    player.addChildNode(playerChildNode)
+
+    rootNode.addChildNode(player)
+}
+</code></pre>
+
+<p>You have made 3 modifications to the <code>setupPlayer()</code> method:</p>
+
+<ol>
+<li>You changed the <code>player</code> node from a node loaded from a file to a simple <code>SCNNode</code>. This node will act as a parent node and the one you will move around.</li>
+<li>Instead of loading the frog node into the player node, you load it into a second node and assign the material to this node&#39;s geometry. You also move it slightly backwards to make it align properly in the level.</li>
+<li>The second node is added as a child node of the player node.</li>
+</ol>
+
+<p>These modifications will allow you to abstract the animation of the geometry (jumping frog) from the positioning of the node in the scene. Hence, you can make the frog jump without the camera following the jump.</p>
+
+<p>Before this works, you have to go back to <code>movePlayerInDirection(direction:)</code> and make some modifications to the actions you created earlier.</p>
+
+<p>Change <code>player.runAction(SCNAction.group([moveAction, jumpAction]))</code> to:</p>
+
+<pre><code>player.runAction(moveAction)
+</code></pre>
+
+<p>Just after that line, add the following code:</p>
+
+<pre><code>playerChildNode.runAction(jumpAction)
+</code></pre>
+
+<p>Now, the movement of the player is done on the <code>player</code> node, while the jump action is done on the <code>playerChildNode</code>.</p>
+
+<p>Build and run. Now only the frog is jumping. Also, try jumping all the way to the end of the level.</p>
+
+<h2 id="toc_4">End of level</h2>
+
+<p>If you tried jumping all the way to the end of the level you will have noticed that the game does not end. You&#39;ll need to add some code to check for that.</p>
+
+<p>Scene Kit provide a delegate <code>SCNSceneRendererDelegate</code> that contains a number of methods that are called at specific times during the frame processing of a scene.</p>
+
+<p><img src="./3-LabImages/SCNSceneRendererDelegate.png" alt=""></p>
+
+<p><strong>renderer:updateAtTime:</strong> will be called exactly once every frame and is the same as the update method in Sprite Kit. This is where you will implement game logic into your rendering loop.</p>
+
+<p>In <strong>GameScene.swift</strong>, add the following code to renderer(_:didRenderScene:atTime:):</p>
+
+<pre><code>if gameState == GameState.Playing &amp;&amp; playerGridRow == levelData.data.rowCount() - 6 {
+    // player completed the level
+    switchToGameOver()
+}
+</code></pre>
+
+<p>This is a simple check to test if the player reached the sixth-last row in the level. Since the five last rows consists purely of trees, the sixth-last row is the last row of the level. When the player reaches the last row the game ends.</p>
+
+<h2 id="toc_5">Let&#39;s get physical</h2>
+
+<p>Just like Sprite Kit, Scene Kit comes with a build-in physics engine. You will use this physics engine to add collision detection to the game.</p>
+
+<p>First thing you need to do is to add a physicsBody to the player. Jump to <code>setupPlayer()</code> and add the following code just before the line <code>rootNode.addChildNode(player)</code>:</p>
+
+<pre><code>// 1 - Create a kinematic physicsbody for collision detection
+playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+
+// 2 - Get notifications when the player collides with a car
+playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
+playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
+</code></pre>
+
+<p>This creates a kinematic physicsBody for the playerChildNode. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.</p>
+
+<p>By passing <code>nil</code> to <code>SCNPhysicsBody</code> for the <code>shape</code> parameter, the <strong>SCNPhysicsBody</strong> will automatically create a shape based on the geometry of the node.</p>
+
+<p>Second, you set the <code>categoryBitMask</code> to indicate the object is a <code>.Player</code> and you set <code>collisionBitMask</code> to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.</p>
+
+<p>To detect collisions between the player and the cars you will add in the challenge, add the following code to the <code>physicsWorld(world: didBeginContact)</code>:</p>
+
+<pre><code>if gameState == GameState.Playing {
+    switchToGameOver()
+}
+</code></pre>
+
+<p>This code will make the game end every time there is a collision. There is no need to test what actually collided as this game will only ever have a collision when the player collides with a car.</p>
+
+<p>You will not be able to test this code until you have completed the Challenge but you are now set up for collision detection.</p>
+
+<h2 id="toc_6">End of lab</h2>
+
+<p>Congratulations. You have now added the code to make the player move using SCNActions, made the camera follow the player, to check for the player reaching the end of the level and prepared the game for collision detection.</p>
+
+<p>In the Challenge session next, you will use all of the knowledge you have gained until now to add cars onto the roads for the player to avoid.</p>
 
 
 </body>

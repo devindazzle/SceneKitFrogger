@@ -71,6 +71,11 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     
     player.addChildNode(playerChildNode)
     
+    // Create a physicsbody for collision detection
+    playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
+    playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
+    
     rootNode.addChildNode(player)
   }
   
@@ -243,7 +248,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
-    
+    if gameState == GameState.Playing {
+      switchToGameOver()
+    }
   }
   
   

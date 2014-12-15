@@ -1,8 +1,6 @@
 # 208: Scene Kit, Part 3: Lab Instructions
 
-At this point, you have the basic structure of the game set up for SCNFrogger.
-
-
+At this point, you have the basic structure of the game set up for SCNFrogger but there is no way to move the frog around the level. That is what you will do in the Lab.
 
 All the changes to the game you will make in the Lab will be in **GameScene.swift**.
 
@@ -142,11 +140,36 @@ This is a simple check to test if the player reached the sixth-last row in the l
 
 ## Let's get physical
 
-Add physics bodies
+Just like Sprite Kit, Scene Kit comes with a build-in physics engine. You will use this physics engine to add collision detection to the game.
 
-Set up physicsContactDelegate
+First thing you need to do is to add a physicsBody to the player. Jump to `setupPlayer()` and add the following code just before the line `rootNode.addChildNode(player)`:
+
+	// 1 - Create a kinematic physicsbody for collision detection
+	playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+	
+	// 2 - Get notifications when the player collides with a car
+	playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
+	playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
+
+This creates a kinematic physicsBody for the playerChildNode. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.
+
+By passing `nil` to `SCNPhysicsBody` for the `shape` parameter, the **SCNPhysicsBody** will automatically create a shape based on the geometry of the node.
+
+Second, you set the `categoryBitMask` to indicate the object is a `.Player` and you set `collisionBitMask` to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.
+
+To detect collisions between the player and the cars you will add in the challenge, add the following code to the `physicsWorld(world: didBeginContact)`:
+
+	if gameState == GameState.Playing {
+		switchToGameOver()
+	}
+
+This code will make the game end every time there is a collision. There is no need to test what actually collided as this game will only ever have a collision when the player collides with a car.
+
+You will not be able to test this code until you have completed the Challenge but you are now set up for collision detection.
 
 
 ## End of lab
 
-Congratulations. You have now added the code to make the player move using SCNActions, made the camera follow the player and to check for the player reaching the end of the level. In the Challenge session next, you will use all of this knowledge to add cars onto the roads for the player to avoid.
+Congratulations. You have now added the code to make the player move using SCNActions, made the camera follow the player, to check for the player reaching the end of the level and prepared the game for collision detection.
+
+In the Challenge session next, you will use all of the knowledge you have gained until now to add cars onto the roads for the player to avoid.
