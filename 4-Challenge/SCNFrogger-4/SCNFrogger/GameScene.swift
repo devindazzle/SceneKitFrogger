@@ -31,6 +31,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   var playerGridRow = 6
   var playerChildNode: SCNNode!
   
+  let carScene = SCNScene(named: "assets.scnassets/Models/car.dae")
+  
   
   // MARK: Init
   init(view: SCNView) {
@@ -256,6 +258,21 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   func spawnCarAtPosition(position: SCNVector3) {
     
+    // Create a material using the model_texture.tga image
+    let carMaterial = SCNMaterial()
+    carMaterial.diffuse.contents = UIImage(named: "assets.scnassets/Textures/model_texture.tga")
+    carMaterial.locksAmbientWithDiffuse = false
+    
+    // Create a clone of the Car node of the carScene - you need a clone because you need to add many cars
+    let carNode = carScene!.rootNode.childNodeWithName("Car", recursively: false)!.clone() as SCNNode
+    
+    carNode.name = "Car"
+    carNode.position = SCNVector3(x: 0.0, y: position.y, z: position.z)
+    
+    // Set the material
+    carNode.geometry!.firstMaterial = carMaterial
+    
+    rootNode.addChildNode(carNode)
   }
   
   

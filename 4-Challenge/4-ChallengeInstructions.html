@@ -306,7 +306,71 @@ sup {
 <body>
 <h1 id="toc_0">208: Scene Kit, Part 4: Challenge</h1>
 
+<p>Your frogger-clone is starting to shape up. But there is one thing missing before this game is any fun: A challenge.</p>
+
+<p>Your challenge will be to add cars to the roads based on what you have learned so far:</p>
+
+<ol>
+<li>Add nodes to the scene for the cars</li>
+<li>Load geometry to make the cars actually look like cars</li>
+<li>Put a material on the car geometry to make the car look nice.</li>
+<li>Make the car move along the road using actions.</li>
+</ol>
+
+<p>Once you have finished this challenge, you will have made a bare-bone frogger-clone with all the basic mechanics.</p>
+
+<h2 id="toc_1">Challenge A: Nodes and geometry</h2>
+
+<p>The first challenge is to create a car by loading the geometry from a file for the car.</p>
+
+<p>The challenge project already includes a COLLADA file for the cars called <strong>car.dae</strong> in the <strong>Models</strong> folder of <strong>assets.scnassets</strong>.</p>
+
+<p>Start by adding this property to the top of <strong>GameScene.swift</strong>:</p>
+
+<pre><code>let carScene = SCNScene(named: &quot;assets.scnassets/Models/car.dae&quot;)
+</code></pre>
+
+<p>This simply loads the <strong>car.dae</strong> scene into the <code>carScene</code> property just like you did for the player in the Demo.</p>
+
+<p><strong>GameScene.swift</strong> already contains a method you should use for creating cars called <code>spawnCarAtPosition(position:)</code>. This is a delegate method that is called from a <strong>GameLevel</strong> object when a new car needs to be added to a road. A position is passed as a parameter that you will use to position the car. </p>
+
+<p>You do not need to understand how the <strong>GameLevel</strong> class works for this tutorial - but feel free to study it later.</p>
+
+<p>Your first challenge is to write the code to add a car whenever the <code>spawnCarAtPosition(position:)</code> method is called. Two things you need to do:</p>
+
+<ol>
+<li><p>When you create a car, you need to make it a clone of the node you get from carScene. This is done by using .clone() like so:</p>
+
+<p><code>let myNode = otherNode.rootNode.childNodeWithName(&quot;Child Node Name&quot;, recursively: false)!.clone() as SCNNode</code></p></li>
+<li><p>When setting the position of the car node in <strong>Challenge A</strong>, you should use the position SCNVector3(x: 0.0, y: position.y, z: position.z). That will put the car in the middle of the road to start with so that it is visible to you when you build and run.</p></li>
+</ol>
+
+<p>If you did things correctly, you should see cars appear on the roads after approximately 5 seconds.</p>
+
+<h2 id="toc_2">Challenge B: Materials</h2>
+
+<p>Did you get cars onto the roads? Very good! But they look a bit dull, right?</p>
+
+<p>Your next challenge is to change that by adding a material to the car.
+You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challenge by adding a material that uses the texture <strong>model_texture.tga</strong> in the <strong>Models</strong> folder in <strong>assets.scnassets</strong>.</p>
+
+<p><strong>Hint:</strong> Remember how it was done in <strong>setupPlayer()</strong>?</p>
+
+<h2 id="toc_3">Challenge C: Actions</h2>
+
+<p>If you completed <strong>Challenge B</strong> you now have some very nice, but static, cars on your scene. Your next challenge will be to make them move.</p>
+
+<h2 id="toc_4">Challenge D: Physics and collisions</h2>
+
 <p>SS</p>
+
+<h2 id="toc_5">The end of the road</h2>
+
+<p>If you managed to get through all the challenges, you now have all the basic skills to start making your own 3D games with Scene Kit.</p>
+
+<p>There are many ways you could have solved these challenges and there are no right or wrong ways. Of cause, some solutions are more performant than others but in general the most important thing is not to optimize until there is a performance issue – that is the golden rule of making games :]</p>
+
+<p>If you want to see how the instructor solved these challenges you’ll find am Xcode project in the Challenge folder of the tutorial materials.</p>
 
 
 </body>
