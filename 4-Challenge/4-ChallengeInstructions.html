@@ -358,11 +358,33 @@ You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challeng
 
 <h2 id="toc_3">Challenge C: Actions</h2>
 
-<p>If you completed <strong>Challenge B</strong> you now have some very nice, but static, cars on your scene. Your next challenge will be to make them move.</p>
+<p>If you completed <strong>Challenge B</strong> you now have some very nice, but static, cars in your scene. Your next challenge will be to make them move by placing the cars in at the position passed to the <code>spawnCarAtPosition(position:)</code> and then choose an appropriate action to make them move at a good speed.</p>
+
+<p>Use the following code to know how far to move the car:</p>
+
+<pre><code>let moveDistance = levelData.gameLevelWidth()
+</code></pre>
+
+<p>This returns a Float that tells you the total width of the level.</p>
+
+<p>You will also need to make the cars move in the right direction as some of the cars need to move from left-to-right while others will move from right-to-left.</p>
+
+<p>To tell which direction you need to move the car, use the following code:</p>
+
+<pre><code>let moveDirection: Float = position.x &gt; 0.0 ? -1.0 : 1.0
+</code></pre>
+
+<p>This sets the moveDirection to either positive or negative 1.0 depending on whether the car starts at an x-position that is to the left or right of the center. You need to multiply this to the moveDistance.</p>
+
+<p><strong>Extra challenge if you have time:</strong> Rotate carNode to ensure the car is facing in the driving direction. At the moment, some cars are driving backwards.</p>
 
 <h2 id="toc_4">Challenge D: Physics and collisions</h2>
 
-<p>SS</p>
+<p>Your last challenge of the day is to create a kinematic <strong>physicsBody</strong> for the car so that collisions are detected if the frog and the car collides.</p>
+
+<p>When creating the <strong>physicsBody</strong>, set the <code>categoryBitMask</code> to <code>PhysicsCategory.Car</code>. You do not need to set the collisionBitmask.</p>
+
+<p><strong>Important:</strong> You need to create the physicsBody after you have created the carNode but before you add the car to the scene. Otherwise, you will get unexpected results (might be a bug in Scene Kit).</p>
 
 <h2 id="toc_5">The end of the road</h2>
 

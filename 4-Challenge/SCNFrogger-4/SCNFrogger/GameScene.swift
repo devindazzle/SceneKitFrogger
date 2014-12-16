@@ -155,7 +155,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   // MARK: Game State
   func switchToWaitingForFirstTap() {
-    
     gameState = GameState.WaitingForFirstTap
     
     // Fade in
@@ -267,12 +266,26 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     let carNode = carScene!.rootNode.childNodeWithName("Car", recursively: false)!.clone() as SCNNode
     
     carNode.name = "Car"
-    carNode.position = SCNVector3(x: 0.0, y: position.y, z: position.z)
+    carNode.position = position // SCNVector3(x: 0.0, y: position.y, z: position.z)
     
     // Set the material
     carNode.geometry!.firstMaterial = carMaterial
     
+    // Create a physicsbody for collision detection
+    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
+    
     rootNode.addChildNode(carNode)
+    
+    // Move the car
+    let moveDirection: Float = position.x > 0.0 ? -1.0 : 1.0
+    let moveDistance = levelData.gameLevelWidth()
+    carNode.runAction(SCNAction.moveBy(SCNVector3(x: moveDistance * moveDirection, y: 0.0, z: 0.0), duration: 10.0))
+    
+    // Rotate the car to move it in the right direction
+    if moveDirection > 0.0 {
+      carNode.rotation = SCNVector4(x: 0.0, y: 1.0, z: 0.0, w: 3.1415)
+    }
   }
   
   
@@ -323,7 +336,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       break
       
     case .Playing:
-      
       // 1 - Check for player movement
       let gridColumnAndRowAfterMove = levelData.gridColumnAndRowAfterMoveInDirection(direction, currentGridColumn: playerGridCol, currentGridRow: playerGridRow)
       

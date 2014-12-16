@@ -39,12 +39,33 @@ Your next challenge is to change that by adding a material to the car.You’ll 
 
 ## Challenge C: Actions
 
-If you completed **Challenge B** you now have some very nice, but static, cars on your scene. Your next challenge will be to make them move.
+If you completed **Challenge B** you now have some very nice, but static, cars in your scene. Your next challenge will be to make them move by placing the cars in at the position passed to the `spawnCarAtPosition(position:)` and then choose an appropriate action to make them move at a good speed.
+
+Use the following code to know how far to move the car:
+
+	let moveDistance = levelData.gameLevelWidth()
+
+This returns a Float that tells you the total width of the level.
+
+You will also need to make the cars move in the right direction as some of the cars need to move from left-to-right while others will move from right-to-left.
+
+To tell which direction you need to move the car, use the following code:
+
+	let moveDirection: Float = position.x > 0.0 ? -1.0 : 1.0
+
+This sets the moveDirection to either positive or negative 1.0 depending on whether the car starts at an x-position that is to the left or right of the center. You need to multiply this to the moveDistance.
+
+**Extra challenge if you have time:** Rotate carNode to ensure the car is facing in the driving direction. At the moment, some cars are driving backwards.
 
 
 ## Challenge D: Physics and collisions
 
-SS
+Your last challenge of the day is to create a kinematic **physicsBody** for the car so that collisions are detected if the frog and the car collides.
+
+When creating the **physicsBody**, set the `categoryBitMask` to `PhysicsCategory.Car`. You do not need to set the collisionBitmask.
+
+**Important:** You need to create the physicsBody after you have created the carNode but before you add the car to the scene. Otherwise, you will get unexpected results (might be a bug in Scene Kit).
+
 
 ## The end of the road
 
