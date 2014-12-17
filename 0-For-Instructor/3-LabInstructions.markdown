@@ -37,9 +37,9 @@ Add this to the `.Playing` case inside the switch statement in `movePlayerInDire
 	// 4 - Move player
 	let moveAction = SCNAction.moveTo(newPlayerPosition, duration: 0.2)
 	let jumpUpAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: 0.2, z: 0.0), duration: 0.1)
-	jumpUpAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+	jumpUpAction.timingMode = SCNActionTimingMode.EaseOut
 	let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), duration: 0.1)
-	jumpDownAction.timingMode = SCNActionTimingMode.EaseInEaseOut
+	jumpDownAction.timingMode = SCNActionTimingMode.EaseOut
 	let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
 	
 	player.runAction(SCNAction.group([moveAction, jumpAction]))
