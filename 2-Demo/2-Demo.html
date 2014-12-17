@@ -402,7 +402,7 @@ rootNode.addChildNode(camera)
 <pre><code>let playerScene = SCNScene(named: &quot;assets.scnassets/Models/frog.dae&quot;)
 </code></pre>
 
-<p>Go to <code>setupPlayer()</code> and modify the <code>line player = SCNNode()</code> to the following:</p>
+<p>Go to <code>setupPlayer()</code> and modify the line <code>player = SCNNode()</code> to the following:</p>
 
 <pre><code>player = playerScene!.rootNode.childNodeWithName(&quot;Frog&quot;, recursively: false)
 </code></pre>
@@ -412,9 +412,9 @@ rootNode.addChildNode(camera)
 <pre><code>player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
 </code></pre>
 
-<p>After <code>player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)</code> add the following:</p>
+<p>Change the position of the player to:</p>
 
-<pre><code>player.position.y = 0.2
+<pre><code>player.position = (x: 0.0, y: 0.2, z: -1.5)
 </code></pre>
 
 <p>Build and run. The frog now looks (sort of) like a frog.</p>

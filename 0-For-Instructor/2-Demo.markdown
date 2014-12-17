@@ -88,7 +88,7 @@ At the top of **GameScene.swift**, add to bottom of the list of properties:
 
 	let playerScene = SCNScene(named: "assets.scnassets/Models/frog.dae")
 
-Go to `setupPlayer()` and modify the `line player = SCNNode()` to the following:
+Go to `setupPlayer()` and modify the line `player = SCNNode()` to the following:
 
 	player = playerScene!.rootNode.childNodeWithName("Frog", recursively: false)
 	
@@ -96,9 +96,9 @@ Delete the following line:
 
 	player.geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.0)
 	
-After `player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)` add the following:
+Change the position of the player to:
 
-	player.position.y = 0.2
+	player.position = (x: 0.0, y: 0.2, z: -1.5)
 
 Build and run. The frog now looks (sort of) like a frog.
 
