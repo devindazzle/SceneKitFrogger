@@ -20,7 +20,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   var cameraOrthographicScale = 0.5
   var cameraOffsetFromPlayer = SCNVector3(x: 0.25, y: 1.25, z: 0.55)
   
-  var level: SCNNode!
   var levelData: GameLevel!
   let levelWidth: Int = 19
   let levelHeight: Int = 50
