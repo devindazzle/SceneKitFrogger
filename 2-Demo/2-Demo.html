@@ -464,11 +464,20 @@ var playerGridRow = 6
 
 <p>Build and run. Now the player is correctly positioned in the level</p>
 
-<h2 id="toc_11">11) That&#39;s it!</h2>
+<h2 id="toc_11">11) Disabling the build-in camera controls</h2>
+
+<p>Now that the scene is set, you do not need the build-in Scene Kit camera any longer.</p>
+
+<p>Go to <code>viewDidAppear(animated:)</code> in <strong>GameViewController.swift</strong> and change the line <code>scnView.allowsCameraControl = true</code> to:</p>
+
+<pre><code>scnView.allowsCameraControl = false
+</code></pre>
+
+<h2 id="toc_12">12) That&#39;s it!</h2>
 
 <p>Congrats, at this time you should have the scene set up for adding movement to the game and learned a lot about Scene Kit along the way. You are now ready for the Lab.</p>
 
-<h2 id="toc_12">12) Links to applications</h2>
+<h2 id="toc_13">13) Links to applications</h2>
 
 <p>The applications used for creating the 3D models in this tutorial can be found here:</p>
 

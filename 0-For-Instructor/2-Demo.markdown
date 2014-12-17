@@ -140,12 +140,20 @@ to:
 	player.position = levelData.coordinatesForGridPosition(column: playerGridCol, row: playerGridRow)
 	
 Build and run. Now the player is correctly positioned in the level
-	
-## 11) That's it!
+
+## 11) Disabling the build-in camera controls
+
+Now that the scene is set, you do not need the build-in Scene Kit camera any longer.
+
+Go to `viewDidAppear(animated:)` in **GameViewController.swift** and change the line `scnView.allowsCameraControl = true` to:
+
+	scnView.allowsCameraControl = false
+
+## 12) That's it!
 
 Congrats, at this time you should have the scene set up for adding movement to the game and learned a lot about Scene Kit along the way. You are now ready for the Lab.
 
-## 12) Links to applications
+## 13) Links to applications
 
 The applications used for creating the 3D models in this tutorial can be found here:
 
