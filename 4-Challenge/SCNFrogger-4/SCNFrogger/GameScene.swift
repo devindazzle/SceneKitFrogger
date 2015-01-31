@@ -154,6 +154,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   // MARK: Game State
   func switchToWaitingForFirstTap() {
+    
+    println("Switching to game state: WaitingForFirstTap")
+    
     gameState = GameState.WaitingForFirstTap
     
     // Fade in
@@ -173,6 +176,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func switchToPlaying() {
+    
+    println("Switching to game state: Playing")
+    
     gameState = GameState.Playing
     if let overlay = sceneView.overlaySKScene {
       // Remove tutorial
@@ -186,6 +192,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func switchToGameOver() {
+    
+    println("Switching to game state: Game Over")
+    
     gameState = GameState.GameOver
     
     if let overlay = sceneView.overlaySKScene {
@@ -212,6 +221,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func switchToRestartLevel() {
+    
+    println("Switching to game state: Restart Level")
+    
     gameState = GameState.RestartLevel
     if let overlay = sceneView.overlaySKScene {
       
@@ -248,8 +260,18 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
+    
+    let other = contact.nodeA.categoryBitMask == PhysicsCategory.Player ? contact.nodeB : contact.nodeA
+    
+    println("\(contact.nodeA.name) collided with \(contact.nodeB.name)")
+    
     if gameState == GameState.Playing {
-      switchToGameOver()
+      //switchToGameOver()
+      let blinkAction1 = SCNAction.fadeOutWithDuration(0.1)
+      let blinkAction2 = SCNAction.fadeInWithDuration(0.1)
+      let blink = SCNAction.sequence([blinkAction1, blinkAction2])
+      
+      other.runAction(SCNAction.repeatActionForever(blink))
     }
   }
   
@@ -265,7 +287,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     let carNode = carScene!.rootNode.childNodeWithName("Car", recursively: false)!.clone() as SCNNode
     
     carNode.name = "Car"
-    carNode.position = position // SCNVector3(x: 0.0, y: position.y, z: position.z)
+    
+    carNode.position = position
     
     // Set the material
     carNode.geometry!.firstMaterial = carMaterial
@@ -273,13 +296,20 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     // Create a physicsbody for collision detection
     carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
     carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
+    carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
     
     rootNode.addChildNode(carNode)
+    
+    
     
     // Move the car
     let moveDirection: Float = position.x > 0.0 ? -1.0 : 1.0
     let moveDistance = levelData.gameLevelWidth()
-    carNode.runAction(SCNAction.moveBy(SCNVector3(x: moveDistance * moveDirection, y: 0.0, z: 0.0), duration: 10.0))
+    let moveAction = SCNAction.moveBy(SCNVector3(x: moveDistance * moveDirection, y: 0.0, z: 0.0), duration: 10.0)
+    let removeAction = SCNAction.runBlock { node -> Void in
+      node.removeFromParentNode()
+    }
+    carNode.runAction(SCNAction.sequence([moveAction, removeAction]))
     
     // Rotate the car to move it in the right direction
     if moveDirection > 0.0 {

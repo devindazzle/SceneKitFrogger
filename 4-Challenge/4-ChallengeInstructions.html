@@ -327,8 +327,7 @@ sup {
 
 <p>Start by adding this property to the top of <strong>GameScene.swift</strong>:</p>
 
-<pre><code>let carScene = SCNScene(named: &quot;assets.scnassets/Models/car.dae&quot;)
-</code></pre>
+<pre><code>let carScene = SCNScene(named: &quot;assets.scnassets/Models/car.dae&quot;)</code></pre>
 
 <p>This simply loads the <strong>car.dae</strong> scene into the <code>carScene</code> property just like you did for the player in the Demo.</p>
 
@@ -362,8 +361,7 @@ You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challeng
 
 <p>Use the following code to know how far to move the car:</p>
 
-<pre><code>let moveDistance = levelData.gameLevelWidth()
-</code></pre>
+<pre><code>let moveDistance = levelData.gameLevelWidth()</code></pre>
 
 <p>This returns a Float that tells you the total width of the level.</p>
 
@@ -371,8 +369,7 @@ You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challeng
 
 <p>To tell which direction you need to move the car, use the following code:</p>
 
-<pre><code>let moveDirection: Float = position.x &gt; 0.0 ? -1.0 : 1.0
-</code></pre>
+<pre><code>let moveDirection: Float = position.x &gt; 0.0 ? -1.0 : 1.0</code></pre>
 
 <p>This sets the moveDirection to either positive or negative 1.0 depending on whether the car starts at an x-position that is to the left or right of the center. You need to multiply this to the moveDistance.</p>
 
@@ -382,7 +379,7 @@ You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challeng
 
 <p>Your last challenge of the day is to create a kinematic <strong>physicsBody</strong> for the car so that collisions are detected if the frog and the car collides.</p>
 
-<p>When creating the <strong>physicsBody</strong>, set the <code>categoryBitMask</code> to <code>PhysicsCategory.Car</code>. You do not need to set the collisionBitmask.</p>
+<p>When creating the <strong>physicsBody</strong>, set the <code>categoryBitMask</code> to <code>PhysicsCategory.Car</code> and <code>collisionBitMask</code> to <code>PhysicsCategory.Player</code>.</p>
 
 <p><strong>Important:</strong> You need to create the physicsBody after you have created the carNode but before you add the car to the scene. Otherwise, you will get unexpected results (might be a bug in Scene Kit).</p>
 

@@ -62,7 +62,7 @@ This sets the moveDirection to either positive or negative 1.0 depending on whet
 
 Your last challenge of the day is to create a kinematic **physicsBody** for the car so that collisions are detected if the frog and the car collides.
 
-When creating the **physicsBody**, set the `categoryBitMask` to `PhysicsCategory.Car`. You do not need to set the collisionBitmask.
+When creating the **physicsBody**, set the `categoryBitMask` to `PhysicsCategory.Car` and `collisionBitMask` to `PhysicsCategory.Player`.
 
 **Important:** You need to create the physicsBody after you have created the carNode but before you add the car to the scene. Otherwise, you will get unexpected results (might be a bug in Scene Kit).
 
