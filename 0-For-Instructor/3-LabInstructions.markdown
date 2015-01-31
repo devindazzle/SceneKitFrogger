@@ -144,18 +144,21 @@ Just like Sprite Kit, Scene Kit comes with a build-in physics engine. You will u
 
 First thing you need to do is to add a physicsBody to the player. Jump to `setupPlayer()` and add the following code just before the line `rootNode.addChildNode(player)`:
 
-	// 1 - Create a kinematic physicsbody for collision detection
-	playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+	// 1 - Create a physics shape as a box that is a bit smaller than the model
+	let playerPhysicsBodyShape = SCNPhysicsShape(geometry: SCNBox(width: 0.08, height: 0.08, length: 0.08, chamferRadius: 0.0), options: nil)
+
+	// 2 - Create a kinematic physicsbody for collision detection
+	playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: playerPhysicsBodyShape)
 	
-	// 2 - Get notifications when the player collides with a car
+	// 3 - Get notifications when the player collides with a car
 	playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
 	playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
 
-This creates a kinematic physicsBody for the playerChildNode. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.
+First, a physics shape is created in the shape of a box. The box is made a little smaller than the model to make the game a bit forgiving.
 
-By passing `nil` to `SCNPhysicsBody` for the `shape` parameter, the **SCNPhysicsBody** will automatically create a shape based on the geometry of the node.
+Second, a kinematic physicsBody for the playerChildNode is created using the physics shape created in step 1. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.
 
-Second, you set the `categoryBitMask` to indicate the object is a `.Player` and you set `collisionBitMask` to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.
+Last, you set the `categoryBitMask` to indicate the object is a `.Player` and you set `collisionBitMask` to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.
 
 To detect collisions between the player and the cars you will add in the challenge, add the following code to the `physicsWorld(world: didBeginContact)`:
 

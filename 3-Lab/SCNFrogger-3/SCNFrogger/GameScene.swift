@@ -71,7 +71,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     player.addChildNode(playerChildNode)
     
     // Create a physicsbody for collision detection
-    playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    let playerPhysicsBodyShape = SCNPhysicsShape(geometry: SCNBox(width: 0.08, height: 0.08, length: 0.08, chamferRadius: 0.0), options: nil)
+    
+    playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: playerPhysicsBodyShape)
     playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
     playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
     

@@ -314,8 +314,7 @@ sup {
 
 <p>You&#39;ll start by adjusting the camera to follow the player. In <code>setupCamera()</code>, change the line <code>rootNode.addChildNode(camera)</code> to:</p>
 
-<pre><code>player.addChildNode(camera)
-</code></pre>
+<pre><code>player.addChildNode(camera)</code></pre>
 
 <p>This makes the camera a child node of the player which will make the camera move when the player (parent) node moves.</p>
 
@@ -348,8 +347,7 @@ let jumpDownAction = SCNAction.moveBy(SCNVector3(x: 0.0, y: -0.2, z: 0.0), durat
 jumpDownAction.timingMode = SCNActionTimingMode.EaseOut
 let jumpAction = SCNAction.sequence([jumpUpAction, jumpDownAction])
 
-player.runAction(SCNAction.group([moveAction, jumpAction]))
-</code></pre>
+player.runAction(SCNAction.group([moveAction, jumpAction]))</code></pre>
 
 <p>There is a lot of code here, so let&#39;s go through it step-by-step:</p>
 
@@ -374,8 +372,7 @@ player.runAction(SCNAction.group([moveAction, jumpAction]))
 
 <p>At the top of <strong>GameScene.swift</strong>, add the following property:</p>
 
-<pre><code>var playerChildNode: SCNNode!
-</code></pre>
+<pre><code>var playerChildNode: SCNNode!</code></pre>
 
 <p>Then go to <code>setupPlayer()</code>, and modify it to look like the following:</p>
 
@@ -399,8 +396,7 @@ player.runAction(SCNAction.group([moveAction, jumpAction]))
     player.addChildNode(playerChildNode)
 
     rootNode.addChildNode(player)
-}
-</code></pre>
+}</code></pre>
 
 <p>You have made 3 modifications to the <code>setupPlayer()</code> method:</p>
 
@@ -416,13 +412,11 @@ player.runAction(SCNAction.group([moveAction, jumpAction]))
 
 <p>Change <code>player.runAction(SCNAction.group([moveAction, jumpAction]))</code> to:</p>
 
-<pre><code>player.runAction(moveAction)
-</code></pre>
+<pre><code>player.runAction(moveAction)</code></pre>
 
 <p>Just after that line, add the following code:</p>
 
-<pre><code>playerChildNode.runAction(jumpAction)
-</code></pre>
+<pre><code>playerChildNode.runAction(jumpAction)</code></pre>
 
 <p>Now, the movement of the player is done on the <code>player</code> node, while the jump action is done on the <code>playerChildNode</code>.</p>
 
@@ -443,8 +437,7 @@ player.runAction(SCNAction.group([moveAction, jumpAction]))
 <pre><code>if gameState == GameState.Playing &amp;&amp; playerGridRow == levelData.data.rowCount() - 6 {
     // player completed the level
     switchToGameOver()
-}
-</code></pre>
+}</code></pre>
 
 <p>This is a simple check to test if the player reached the sixth-last row in the level. Since the five last rows consists purely of trees, the sixth-last row is the last row of the level. When the player reaches the last row the game ends.</p>
 
@@ -454,26 +447,27 @@ player.runAction(SCNAction.group([moveAction, jumpAction]))
 
 <p>First thing you need to do is to add a physicsBody to the player. Jump to <code>setupPlayer()</code> and add the following code just before the line <code>rootNode.addChildNode(player)</code>:</p>
 
-<pre><code>// 1 - Create a kinematic physicsbody for collision detection
-playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+<pre><code>// 1 - Create a physics shape as a box that is a bit smaller than the model
+let playerPhysicsBodyShape = SCNPhysicsShape(geometry: SCNBox(width: 0.08, height: 0.08, length: 0.08, chamferRadius: 0.0), options: nil)
 
-// 2 - Get notifications when the player collides with a car
+// 2 - Create a kinematic physicsbody for collision detection
+playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: playerPhysicsBodyShape)
+
+// 3 - Get notifications when the player collides with a car
 playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
-playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
-</code></pre>
+playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car</code></pre>
 
-<p>This creates a kinematic physicsBody for the playerChildNode. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.</p>
+<p>First, a physics shape is created in the shape of a box. The box is made a little smaller than the model to make the game a bit forgiving.</p>
 
-<p>By passing <code>nil</code> to <code>SCNPhysicsBody</code> for the <code>shape</code> parameter, the <strong>SCNPhysicsBody</strong> will automatically create a shape based on the geometry of the node.</p>
+<p>Second, a kinematic physicsBody for the playerChildNode is created using the physics shape created in step 1. Kinematic bodies are unaffected by forces or collisions but that can cause collisions affecting other bodies. This is what you need as you do not want the physics engine affect the movement of the player.</p>
 
-<p>Second, you set the <code>categoryBitMask</code> to indicate the object is a <code>.Player</code> and you set <code>collisionBitMask</code> to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.</p>
+<p>Last, you set the <code>categoryBitMask</code> to indicate the object is a <code>.Player</code> and you set <code>collisionBitMask</code> to indicate that this node should produce notifications whenever it touches a physics body that belongs to the .Car category.</p>
 
 <p>To detect collisions between the player and the cars you will add in the challenge, add the following code to the <code>physicsWorld(world: didBeginContact)</code>:</p>
 
 <pre><code>if gameState == GameState.Playing {
     switchToGameOver()
-}
-</code></pre>
+}</code></pre>
 
 <p>This code will make the game end every time there is a collision. There is no need to test what actually collided as this game will only ever have a collision when the player collides with a car.</p>
 

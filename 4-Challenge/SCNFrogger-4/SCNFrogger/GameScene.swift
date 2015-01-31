@@ -73,7 +73,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     player.addChildNode(playerChildNode)
     
     // Create a physicsbody for collision detection
-    playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    let playerPhysicsBodyShape = SCNPhysicsShape(geometry: SCNBox(width: 0.08, height: 0.08, length: 0.08, chamferRadius: 0.0), options: nil)
+    
+    playerChildNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: playerPhysicsBodyShape)
     playerChildNode.physicsBody!.categoryBitMask = PhysicsCategory.Player
     playerChildNode.physicsBody!.collisionBitMask = PhysicsCategory.Car
     
@@ -155,8 +157,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   // MARK: Game State
   func switchToWaitingForFirstTap() {
     
-    println("Switching to game state: WaitingForFirstTap")
-    
     gameState = GameState.WaitingForFirstTap
     
     // Fade in
@@ -177,8 +177,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   func switchToPlaying() {
     
-    println("Switching to game state: Playing")
-    
     gameState = GameState.Playing
     if let overlay = sceneView.overlaySKScene {
       // Remove tutorial
@@ -192,8 +190,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func switchToGameOver() {
-    
-    println("Switching to game state: Game Over")
     
     gameState = GameState.GameOver
     
@@ -221,8 +217,6 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func switchToRestartLevel() {
-    
-    println("Switching to game state: Restart Level")
     
     gameState = GameState.RestartLevel
     if let overlay = sceneView.overlaySKScene {
@@ -260,18 +254,8 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
   
   
   func physicsWorld(world: SCNPhysicsWorld, didBeginContact contact: SCNPhysicsContact) {
-    
-    let other = contact.nodeA.categoryBitMask == PhysicsCategory.Player ? contact.nodeB : contact.nodeA
-    
-    println("\(contact.nodeA.name) collided with \(contact.nodeB.name)")
-    
     if gameState == GameState.Playing {
-      //switchToGameOver()
-      let blinkAction1 = SCNAction.fadeOutWithDuration(0.1)
-      let blinkAction2 = SCNAction.fadeInWithDuration(0.1)
-      let blink = SCNAction.sequence([blinkAction1, blinkAction2])
-      
-      other.runAction(SCNAction.repeatActionForever(blink))
+      switchToGameOver()
     }
   }
   
@@ -294,7 +278,9 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
     carNode.geometry!.firstMaterial = carMaterial
     
     // Create a physicsbody for collision detection
-    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: nil)
+    let carPhysicsBodyShape = SCNPhysicsShape(geometry: SCNBox(width: 0.30, height: 0.20, length: 0.16, chamferRadius: 0.0), options: nil)
+    
+    carNode.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.Kinematic, shape: carPhysicsBodyShape)
     carNode.physicsBody!.categoryBitMask = PhysicsCategory.Car
     carNode.physicsBody!.collisionBitMask = PhysicsCategory.Player
     
@@ -406,6 +392,19 @@ class GameScene : SCNScene, SCNSceneRendererDelegate, SCNPhysicsContactDelegate,
       break
     }
     
+  }
+  
+  
+  func sizeOfBoundingBoxFromNode(node: SCNNode) -> (width: Float, height: Float, depth: Float) {
+    var boundingBoxMin = SCNVector3Zero
+    var boundingBoxMax = SCNVector3Zero
+    let boundingBox = node.getBoundingBoxMin(&boundingBoxMin, max: &boundingBoxMax)
+    
+    let width = boundingBoxMax.x - boundingBoxMin.x
+    let height = boundingBoxMax.y - boundingBoxMin.y
+    let depth = boundingBoxMax.z - boundingBoxMin.z
+    
+    return (width, height, depth)
   }
   
 }

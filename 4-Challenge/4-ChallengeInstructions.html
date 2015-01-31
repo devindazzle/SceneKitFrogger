@@ -379,6 +379,8 @@ You’ll add code to <code>spawnCarAtPosition(position:)</code> in this challeng
 
 <p>Your last challenge of the day is to create a kinematic <strong>physicsBody</strong> for the car so that collisions are detected if the frog and the car collides.</p>
 
+<p>The PhysicsShape should be a box with the parameters { width: 0.30, height: 0.20, length: 0.16, chamferRadius: 0.0 }</p>
+
 <p>When creating the <strong>physicsBody</strong>, set the <code>categoryBitMask</code> to <code>PhysicsCategory.Car</code> and <code>collisionBitMask</code> to <code>PhysicsCategory.Player</code>.</p>
 
 <p><strong>Important:</strong> You need to create the physicsBody after you have created the carNode but before you add the car to the scene. Otherwise, you will get unexpected results (might be a bug in Scene Kit).</p>
