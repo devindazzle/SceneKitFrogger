@@ -4,7 +4,7 @@ A 3D Frogger / Crossy Road clone made with Scene Kit and Swift.
 
 Source Code for my tutorial on Scene Kit at [RWDevCon](http://www.rwdevcon.com) February 6th-7th, 2015 in Washington DC.
 
-![SCNFrogger](0-For-Instructor/screenshot.png)
+![SCNFrogger](screenshot.png)
 
 Contains all the steps and materials used during the conference:
 
